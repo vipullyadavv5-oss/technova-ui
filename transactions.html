@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeoBank – Transactions</title>
+  <meta name="description" content="NeoBank Transactions – View, filter, and export your full transaction history." />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ---- Page-specific styles ---- */
+    .txn-page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 24px;
+    }
+    .txn-page-header h1 { font-size: 1.4rem; font-weight: 700; }
+    .txn-page-header p  { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+
+    /* Summary strip */
+    .txn-summary-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .summary-tile {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+    .summary-tile:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .summary-tile-icon { width: 44px; height: 44px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .summary-tile-label { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; }
+    .summary-tile-value { font-size: 1.1rem; font-weight: 800; font-family: 'Poppins', sans-serif; letter-spacing: -0.01em; }
+
+    /* Filter / search bar */
+    .txn-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .txn-search {
+      flex: 1;
+      min-width: 220px;
+      position: relative;
+    }
+    .txn-search input {
+      width: 100%;
+      padding: 10px 16px 10px 38px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-full);
+      background: var(--bg-card);
+      color: var(--text);
+      font-size: 13px;
+      font-family: inherit;
+      transition: var(--transition);
+    }
+    .txn-search input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(47,128,237,0.1); }
+    .txn-search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font-size: 14px; color: var(--text-muted); pointer-events: none; }
+
+    .filter-select {
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-full);
+      background: var(--bg-card);
+      color: var(--text);
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .filter-select:focus { outline: none; border-color: var(--primary); }
+    .filter-select:hover { border-color: var(--primary); }
+
+    .export-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 10px 18px;
+      border-radius: var(--radius-full);
+      border: 1.5px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-muted);
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: var(--transition);
+    }
+    .export-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+
+    /* Filter tabs */
+    .filter-chips {
+      display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .chip {
+      padding: 6px 16px;
+      border-radius: var(--radius-full);
+      border: 1.5px solid var(--border);
+      font-size: 13px; font-weight: 500;
+      cursor: pointer; transition: var(--transition);
+      background: var(--bg-card); color: var(--text-muted);
+    }
+    .chip:hover { border-color: var(--primary); color: var(--primary); }
+    .chip.active { background: var(--gradient); color: #fff; border-color: transparent; }
+
+    /* Enhanced transaction table */
+    .txn-card-full {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-light);
+      overflow: hidden;
+    }
+    .txn-table-full { width: 100%; border-collapse: collapse; }
+    .txn-table-full th {
+      text-align: left;
+      font-size: 11px; font-weight: 600;
+      color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;
+      padding: 14px 20px;
+      background: var(--border-light);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+      transition: var(--transition);
+    }
+    .txn-table-full th:hover { color: var(--primary); }
+    .txn-table-full th .sort-icon { font-size: 10px; margin-left: 4px; opacity: 0.5; }
+    .txn-table-full td {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 13px;
+      vertical-align: middle;
+    }
+    .txn-table-full tr:last-child td { border-bottom: none; }
+    .txn-table-full tbody tr { transition: var(--transition); cursor: pointer; }
+    .txn-table-full tbody tr:hover { background: var(--border-light); }
+
+    .txn-merchant-full { display: flex; align-items: center; gap: 12px; }
+    .txn-icon-full {
+      width: 40px; height: 40px; border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .txn-name { font-weight: 600; font-size: 13px; color: var(--text); }
+    .txn-ref  { font-size: 11px; color: var(--text-muted); margin-top: 1px; font-family: monospace; }
+
+    .txn-amount-full { font-weight: 700; font-size: 13px; }
+    .txn-amount-full.credit { color: var(--green); }
+    .txn-amount-full.debit  { color: var(--text); }
+
+    /* Pagination */
+    .pagination {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      font-size: 13px; color: var(--text-muted);
+    }
+    .page-btns { display: flex; gap: 6px; }
+    .page-btn {
+      width: 34px; height: 34px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      background: var(--bg-card);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; color: var(--text-muted);
+      cursor: pointer; transition: var(--transition);
+    }
+    .page-btn:hover   { border-color: var(--primary); color: var(--primary); }
+    .page-btn.active  { background: var(--gradient); color: #fff; border-color: transparent; }
+    .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Hidden row (used by JS filter) */
+    .hidden { display: none; }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center; padding: 60px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state-icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-state-title { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-icon">💳</div>
+      <div>
+        <div class="sidebar-logo-text">NeoBank</div>
+        <div class="sidebar-logo-sub">Digital Banking</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Main</div>
+      <a href="dashboard.html" class="nav-item">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      <a href="transactions.html" class="nav-item active">
+        <span class="nav-icon">↔️</span> Transactions
+        <span class="nav-badge">24</span>
+      </a>
+      <a href="cards.html" class="nav-item">
+        <span class="nav-icon">💳</span> Cards
+      </a>
+      <a href="dashboard.html" class="nav-item">
+        <span class="nav-icon">📊</span> Analytics
+      </a>
+      <div class="sidebar-section-label">Finance</div>
+      <a href="dashboard.html" class="nav-item">
+        <span class="nav-icon">🏦</span> Accounts
+      </a>
+      <a href="dashboard.html" class="nav-item">
+        <span class="nav-icon">💰</span> Savings
+      </a>
+      <a href="dashboard.html" class="nav-item">
+        <span class="nav-icon">📈</span> Investments
+      </a>
+      <div class="sidebar-section-label">Account</div>
+      <a href="dashboard.html" class="nav-item">
+        <span class="nav-icon">⚙️</span> Settings
+      </a>
+      <a href="index.html" class="nav-item">
+        <span class="nav-icon">🚪</span> Logout
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar">JD</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">John Doe</div>
+          <div class="sidebar-user-role">Premium Member</div>
+        </div>
+        <span style="color:rgba(255,255,255,0.3); font-size:14px;">⋮</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <div class="app-main">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2>Transactions ↔️</h2>
+        <p>Full history of your account activity</p>
+      </div>
+      <div class="topbar-right">
+        <div class="search-bar">
+          <span>🔍</span>
+          Search transactions…
+        </div>
+        <button class="notif-btn" id="themeToggle" title="Toggle dark mode">🌙</button>
+        <button class="notif-btn">
+          🔔
+          <span class="notif-dot"></span>
+        </button>
+        <div class="avatar" title="John Doe">JD</div>
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <div class="page-content">
+
+      <!-- Page header + export -->
+      <div class="txn-page-header animate-in">
+        <div>
+          <h1>Transaction History</h1>
+          <p>Showing 24 transactions · March 2025</p>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="export-btn" onclick="exportCSV()">⬇️ Export CSV</button>
+          <button class="btn btn-primary" style="font-size:13px; border-radius:var(--radius-full);">+ New Transfer</button>
+        </div>
+      </div>
+
+      <!-- Summary Strip -->
+      <div class="txn-summary-strip animate-in-delay-1">
+        <div class="summary-tile">
+          <div class="summary-tile-icon" style="background:var(--primary-light);">💰</div>
+          <div>
+            <div class="summary-tile-label">Total Credits</div>
+            <div class="summary-tile-value" style="color:var(--green)">+$8,750.00</div>
+          </div>
+        </div>
+        <div class="summary-tile">
+          <div class="summary-tile-icon" style="background:#FFE4E6;">📤</div>
+          <div>
+            <div class="summary-tile-label">Total Debits</div>
+            <div class="summary-tile-value" style="color:var(--red)">-$3,290.40</div>
+          </div>
+        </div>
+        <div class="summary-tile">
+          <div class="summary-tile-icon" style="background:#DCFCE7;">📈</div>
+          <div>
+            <div class="summary-tile-label">Net Balance Change</div>
+            <div class="summary-tile-value" style="color:var(--green)">+$5,459.60</div>
+          </div>
+        </div>
+        <div class="summary-tile">
+          <div class="summary-tile-icon" style="background:#FEF3C7;">📋</div>
+          <div>
+            <div class="summary-tile-label">Total Transactions</div>
+            <div class="summary-tile-value">24</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter chips -->
+      <div class="filter-chips animate-in-delay-1">
+        <div class="chip active" data-filter="all">All</div>
+        <div class="chip" data-filter="credit">Credits</div>
+        <div class="chip" data-filter="debit">Debits</div>
+        <div class="chip" data-filter="pending">Pending</div>
+        <div class="chip" data-filter="groceries">Groceries</div>
+        <div class="chip" data-filter="dining">Dining</div>
+        <div class="chip" data-filter="transport">Transport</div>
+        <div class="chip" data-filter="subscriptions">Subscriptions</div>
+      </div>
+
+      <!-- Search + Filters toolbar -->
+      <div class="txn-toolbar animate-in-delay-2">
+        <div class="txn-search">
+          <span class="txn-search-icon">🔍</span>
+          <input type="text" id="txnSearch" placeholder="Search by merchant, amount, category…" autocomplete="off" />
+        </div>
+        <select class="filter-select" id="dateFilter">
+          <option value="">📅 All Dates</option>
+          <option value="mar-25">Mar 25</option>
+          <option value="mar-24">Mar 24</option>
+          <option value="mar-23">Mar 23</option>
+          <option value="mar-22">Mar 22</option>
+          <option value="mar-21">Mar 21</option>
+          <option value="mar-20">Mar 20</option>
+          <option value="mar-19">Mar 19</option>
+        </select>
+        <select class="filter-select" id="cardFilter">
+          <option value="">💳 All Cards</option>
+          <option value="4291">•••• 4291</option>
+          <option value="7823">•••• 7823</option>
+          <option value="5504">•••• 5504</option>
+        </select>
+        <select class="filter-select" id="sortFilter">
+          <option value="date-desc">↓ Latest First</option>
+          <option value="date-asc">↑ Oldest First</option>
+          <option value="amount-desc">↓ Highest Amount</option>
+          <option value="amount-asc">↑ Lowest Amount</option>
+        </select>
+      </div>
+
+      <!-- Transactions Table -->
+      <div class="txn-card-full animate-in-delay-2">
+        <table class="txn-table-full" id="txnTable">
+          <thead>
+            <tr>
+              <th>Merchant <span class="sort-icon">⇅</span></th>
+              <th>Category <span class="sort-icon">⇅</span></th>
+              <th>Card Used</th>
+              <th>Date <span class="sort-icon">⇅</span></th>
+              <th>Status</th>
+              <th>Amount <span class="sort-icon">⇅</span></th>
+            </tr>
+          </thead>
+          <tbody id="txnBody">
+            <!-- Row template: data-type, data-category, data-date, data-card, data-amount -->
+
+            <tr data-type="debit" data-category="groceries" data-date="mar-25" data-card="4291" data-amount="-124.50" data-status="completed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#DCFCE7;">🛒</div><div><div class="txn-name">Whole Foods Market</div><div class="txn-ref">TXN#001 · Grocery Shopping</div></div></div></td>
+              <td><span class="badge badge-blue">Groceries</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 4291</td>
+              <td style="color:var(--text-muted);">Mar 25, 2025</td>
+              <td><span class="badge badge-green">✔ Completed</span></td>
+              <td class="txn-amount-full debit">-$124.50</td>
+            </tr>
+
+            <tr data-type="credit" data-category="income" data-date="mar-25" data-card="4291" data-amount="+6250.00" data-status="completed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#EBF3FE;">💼</div><div><div class="txn-name">Salary — TechCorp Inc.</div><div class="txn-ref">TXN#002 · Monthly Payroll</div></div></div></td>
+              <td><span class="badge badge-green">Income</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 4291</td>
+              <td style="color:var(--text-muted);">Mar 25, 2025</td>
+              <td><span class="badge badge-green">✔ Completed</span></td>
+              <td class="txn-amount-full credit">+$6,250.00</td>
+            </tr>
+
+            <tr data-type="debit" data-category="dining" data-date="mar-24" data-card="4291" data-amount="-12.50" data-status="completed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#FEF3C7;">☕</div><div><div class="txn-name">Starbucks Coffee</div><div class="txn-ref">TXN#003 · Food & Beverage</div></div></div></td>
+              <td><span class="badge" style="background:#FEF3C7;color:#92400E;">Dining</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 4291</td>
+              <td style="color:var(--text-muted);">Mar 24, 2025</td>
+              <td><span class="badge badge-green">✔ Completed</span></td>
+              <td class="txn-amount-full debit">-$12.50</td>
+            </tr>
+
+            <tr data-type="debit" data-category="subscriptions" data-date="mar-23" data-card="7823" data-amount="-9.99" data-status="completed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#EDE9FE;">🎵</div><div><div class="txn-name">Spotify Premium</div><div class="txn-ref">TXN#004 · Monthly Subscription</div></div></div></td>
+              <td><span class="badge" style="background:#EDE9FE;color:#5B21B6;">Subscriptions</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 7823</td>
+              <td style="color:var(--text-muted);">Mar 23, 2025</td>
+              <td><span class="badge badge-green">✔ Completed</span></td>
+              <td class="txn-amount-full debit">-$9.99</td>
+            </tr>
+
+            <tr data-type="debit" data-category="subscriptions" data-date="mar-23" data-card="7823" data-amount="-15.99" data-status="completed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#FFE4E6;">📺</div><div><div class="txn-name">Netflix</div><div class="txn-ref">TXN#005 · Monthly Plan</div></div></div></td>
+              <td><span class="badge" style="background:#EDE9FE;color:#5B21B6;">Subscriptions</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 7823</td>
+              <td style="color:var(--text-muted);">Mar 23, 2025</td>
+              <td><span class="badge badge-green">✔ Completed</span></td>
+              <td class="txn-amount-full debit">-$15.99</td>
+            </tr>
+
+            <tr data-type="debit" data-category="transport" data-date="mar-22" data-card="4291" data-amount="-18.40" data-status="completed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#FFE4E6;">🚕</div><div><div class="txn-name">Uber Ride</div><div class="txn-ref">TXN#006 · Transportation</div></div></div></td>
+              <td><span class="badge" style="background:#FFE4E6;color:#9F1239;">Transport</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 4291</td>
+              <td style="color:var(--text-muted);">Mar 22, 2025</td>
+              <td><span class="badge badge-green">✔ Completed</span></td>
+              <td class="txn-amount-full debit">-$18.40</td>
+            </tr>
+
+            <tr data-type="debit" data-category="transport" data-date="mar-22" data-card="7823" data-amount="-55.60" data-status="completed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#EBF3FE;">⛽</div><div><div class="txn-name">Shell Gas Station</div><div class="txn-ref">TXN#007 · Fuel & Transport</div></div></div></td>
+              <td><span class="badge" style="background:#FFE4E6;color:#9F1239;">Transport</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 7823</td>
+              <td style="color:var(--text-muted);">Mar 22, 2025</td>
+              <td><span class="badge badge-green">✔ Completed</span></td>
+              <td class="txn-amount-full debit">-$55.60</td>
+            </tr>
+
+            <tr data-type="debit" data-category="groceries" data-date="mar-22" data-card="4291" data-amount="-67.30" data-status="completed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#DCFCE7;">🥬</div><div><div class="txn-name">Trader Joe's</div><div class="txn-ref">TXN#008 · Grocery Shopping</div></div></div></td>
+              <td><span class="badge badge-blue">Groceries</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 4291</td>
+              <td style="color:var(--text-muted);">Mar 22, 2025</td>
+              <td><span class="badge badge-green">✔ Completed</span></td>
+              <td class="txn-amount-full debit">-$67.30</td>
+            </tr>
+
+            <tr data-type="debit" data-category="dining" data-date="mar-21" data-card="4291" data-amount="-350.00" data-status="pending">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#DCFCE7;">📤</div><div><div class="txn-name">Transfer to Sarah J.</div><div class="txn-ref">TXN#009 · Bank Transfer</div></div></div></td>
+              <td><span class="badge badge-blue">Transfer</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 4291</td>
+              <td style="color:var(--text-muted);">Mar 21, 2025</td>
+              <td><span class="badge" style="background:#FEF3C7;color:#92400E;">⏳ Pending</span></td>
+              <td class="txn-amount-full debit">-$350.00</td>
+            </tr>
+
+            <tr data-type="debit" data-category="dining" data-date="mar-21" data-card="7823" data-amount="-82.40" data-status="completed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#FEF3C7;">🍣</div><div><div class="txn-name">Nobu Restaurant</div><div class="txn-ref">TXN#010 · Food & Dining</div></div></div></td>
+              <td><span class="badge" style="background:#FEF3C7;color:#92400E;">Dining</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 7823</td>
+              <td style="color:var(--text-muted);">Mar 21, 2025</td>
+              <td><span class="badge badge-green">✔ Completed</span></td>
+              <td class="txn-amount-full debit">-$82.40</td>
+            </tr>
+
+            <tr data-type="credit" data-category="income" data-date="mar-20" data-card="4291" data-amount="+2500.00" data-status="completed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#DCFCE7;">💎</div><div><div class="txn-name">Freelance Payment</div><div class="txn-ref">TXN#011 · Client Invoice #204</div></div></div></td>
+              <td><span class="badge badge-green">Income</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 4291</td>
+              <td style="color:var(--text-muted);">Mar 20, 2025</td>
+              <td><span class="badge badge-green">✔ Completed</span></td>
+              <td class="txn-amount-full credit">+$2,500.00</td>
+            </tr>
+
+            <tr data-type="debit" data-category="dining" data-date="mar-20" data-card="4291" data-amount="-120.00" data-status="completed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#EBF3FE;">🏥</div><div><div class="txn-name">City Hospital</div><div class="txn-ref">TXN#012 · Healthcare Visit</div></div></div></td>
+              <td><span class="badge badge-blue">Healthcare</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 4291</td>
+              <td style="color:var(--text-muted);">Mar 20, 2025</td>
+              <td><span class="badge badge-green">✔ Completed</span></td>
+              <td class="txn-amount-full debit">-$120.00</td>
+            </tr>
+
+            <tr data-type="debit" data-category="dining" data-date="mar-19" data-card="7823" data-amount="-34.99" data-status="completed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#FEF3C7;">🍕</div><div><div class="txn-name">Domino's Pizza</div><div class="txn-ref">TXN#013 · Food & Beverage</div></div></div></td>
+              <td><span class="badge" style="background:#FEF3C7;color:#92400E;">Dining</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 7823</td>
+              <td style="color:var(--text-muted);">Mar 19, 2025</td>
+              <td><span class="badge badge-green">✔ Completed</span></td>
+              <td class="txn-amount-full debit">-$34.99</td>
+            </tr>
+
+            <tr data-type="debit" data-category="subscriptions" data-date="mar-19" data-card="5504" data-amount="-14.99" data-status="completed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#EDE9FE;">☁️</div><div><div class="txn-name">iCloud Storage</div><div class="txn-ref">TXN#014 · 2TB Plan</div></div></div></td>
+              <td><span class="badge" style="background:#EDE9FE;color:#5B21B6;">Subscriptions</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 5504</td>
+              <td style="color:var(--text-muted);">Mar 19, 2025</td>
+              <td><span class="badge badge-green">✔ Completed</span></td>
+              <td class="txn-amount-full debit">-$14.99</td>
+            </tr>
+
+            <tr data-type="debit" data-category="transport" data-date="mar-18" data-card="7823" data-amount="-210.00" data-status="completed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#DCFCE7;">✈️</div><div><div class="txn-name">IndiGo Airlines</div><div class="txn-ref">TXN#015 · Flight Booking</div></div></div></td>
+              <td><span class="badge" style="background:#FFE4E6;color:#9F1239;">Transport</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 7823</td>
+              <td style="color:var(--text-muted);">Mar 18, 2025</td>
+              <td><span class="badge badge-green">✔ Completed</span></td>
+              <td class="txn-amount-full debit">-$210.00</td>
+            </tr>
+
+            <tr data-type="debit" data-category="dining" data-date="mar-18" data-card="4291" data-amount="-44.50" data-status="completed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#FEF3C7;">🍔</div><div><div class="txn-name">Five Guys Burger</div><div class="txn-ref">TXN#016 · Food & Dining</div></div></div></td>
+              <td><span class="badge" style="background:#FEF3C7;color:#92400E;">Dining</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 4291</td>
+              <td style="color:var(--text-muted);">Mar 18, 2025</td>
+              <td><span class="badge badge-green">✔ Completed</span></td>
+              <td class="txn-amount-full debit">-$44.50</td>
+            </tr>
+
+            <tr data-type="debit" data-category="groceries" data-date="mar-17" data-card="4291" data-amount="-89.99" data-status="completed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#EDE9FE;">🛍️</div><div><div class="txn-name">Amazon</div><div class="txn-ref">TXN#017 · Online Shopping</div></div></div></td>
+              <td><span class="badge badge-blue">Shopping</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 4291</td>
+              <td style="color:var(--text-muted);">Mar 17, 2025</td>
+              <td><span class="badge badge-green">✔ Completed</span></td>
+              <td class="txn-amount-full debit">-$89.99</td>
+            </tr>
+
+            <tr data-type="debit" data-category="dining" data-date="mar-17" data-card="4291" data-amount="-325.00" data-status="pending">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#EBF3FE;">🏠</div><div><div class="txn-name">Rent — Greenfield Apts.</div><div class="txn-ref">TXN#018 · Monthly Rent</div></div></div></td>
+              <td><span class="badge" style="background:#EDE9FE;color:#5B21B6;">Housing</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 4291</td>
+              <td style="color:var(--text-muted);">Mar 17, 2025</td>
+              <td><span class="badge" style="background:#FEF3C7;color:#92400E;">⏳ Pending</span></td>
+              <td class="txn-amount-full debit">-$325.00</td>
+            </tr>
+
+            <tr data-type="debit" data-category="dining" data-date="mar-16" data-card="5504" data-amount="-29.99" data-status="failed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#DCFCE7;">🎮</div><div><div class="txn-name">PlayStation Store</div><div class="txn-ref">TXN#019 · Game Purchase</div></div></div></td>
+              <td><span class="badge badge-blue">Entertainment</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 5504</td>
+              <td style="color:var(--text-muted);">Mar 16, 2025</td>
+              <td><span class="badge" style="background:var(--red-light);color:#991B1B;">✕ Declined</span></td>
+              <td class="txn-amount-full debit" style="opacity:0.5;">-$29.99</td>
+            </tr>
+
+            <tr data-type="debit" data-category="groceries" data-date="mar-15" data-card="4291" data-amount="-46.20" data-status="completed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#DCFCE7;">🥩</div><div><div class="txn-name">Costco Wholesale</div><div class="txn-ref">TXN#020 · Bulk Groceries</div></div></div></td>
+              <td><span class="badge badge-blue">Groceries</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 4291</td>
+              <td style="color:var(--text-muted);">Mar 15, 2025</td>
+              <td><span class="badge badge-green">✔ Completed</span></td>
+              <td class="txn-amount-full debit">-$46.20</td>
+            </tr>
+
+            <tr data-type="credit" data-category="income" data-date="mar-14" data-card="4291" data-amount="+500.00" data-status="completed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#DCFCE7;">💸</div><div><div class="txn-name">Cashback Reward</div><div class="txn-ref">TXN#021 · NeoBank Reward</div></div></div></td>
+              <td><span class="badge badge-green">Cashback</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 4291</td>
+              <td style="color:var(--text-muted);">Mar 14, 2025</td>
+              <td><span class="badge badge-green">✔ Completed</span></td>
+              <td class="txn-amount-full credit">+$500.00</td>
+            </tr>
+
+            <tr data-type="debit" data-category="subscriptions" data-date="mar-13" data-card="7823" data-amount="-12.99" data-status="completed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#EDE9FE;">🎧</div><div><div class="txn-name">Apple Music</div><div class="txn-ref">TXN#022 · Individual Plan</div></div></div></td>
+              <td><span class="badge" style="background:#EDE9FE;color:#5B21B6;">Subscriptions</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 7823</td>
+              <td style="color:var(--text-muted);">Mar 13, 2025</td>
+              <td><span class="badge badge-green">✔ Completed</span></td>
+              <td class="txn-amount-full debit">-$12.99</td>
+            </tr>
+
+            <tr data-type="debit" data-category="transport" data-date="mar-12" data-card="4291" data-amount="-6.50" data-status="completed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#EBF3FE;">🚇</div><div><div class="txn-name">Metro Card Reload</div><div class="txn-ref">TXN#023 · Public Transport</div></div></div></td>
+              <td><span class="badge" style="background:#FFE4E6;color:#9F1239;">Transport</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 4291</td>
+              <td style="color:var(--text-muted);">Mar 12, 2025</td>
+              <td><span class="badge badge-green">✔ Completed</span></td>
+              <td class="txn-amount-full debit">-$6.50</td>
+            </tr>
+
+            <tr data-type="debit" data-category="dining" data-date="mar-10" data-card="7823" data-amount="-150.00" data-status="completed">
+              <td><div class="txn-merchant-full"><div class="txn-icon-full" style="background:#FEF3C7;">💡</div><div><div class="txn-name">Electricity Bill</div><div class="txn-ref">TXN#024 · Utility Payment</div></div></div></td>
+              <td><span class="badge" style="background:#FEF3C7;color:#92400E;">Utilities</span></td>
+              <td style="color:var(--text-muted);font-family:monospace;font-size:12px;">•••• 7823</td>
+              <td style="color:var(--text-muted);">Mar 10, 2025</td>
+              <td><span class="badge badge-green">✔ Completed</span></td>
+              <td class="txn-amount-full debit">-$150.00</td>
+            </tr>
+
+          </tbody>
+        </table>
+
+        <!-- Empty state (shown by JS when no results) -->
+        <div class="empty-state hidden" id="emptyState">
+          <div class="empty-state-icon">🔍</div>
+          <div class="empty-state-title">No transactions found</div>
+          <div>Try adjusting your filters or search term</div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination">
+          <div>Showing <strong id="shownCount">24</strong> of <strong>24</strong> transactions</div>
+          <div class="page-btns">
+            <button class="page-btn" id="prevBtn" disabled>‹</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn" id="nextBtn">›</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+  </div><!-- /app-main -->
+</div><!-- /app-shell -->
+
+<script>
+  // ---- Filter + Search Logic ----
+  const chips     = document.querySelectorAll('.chip');
+  const searchBox = document.getElementById('txnSearch');
+  const dateFilter   = document.getElementById('dateFilter');
+  const cardFilter   = document.getElementById('cardFilter');
+  const rows      = Array.from(document.querySelectorAll('#txnBody tr'));
+  const emptyState  = document.getElementById('emptyState');
+  const shownCount  = document.getElementById('shownCount');
+
+  let activeFilter = 'all';
+
+  function applyFilters() {
+    const query  = searchBox.value.toLowerCase().trim();
+    const date   = dateFilter.value;
+    const card   = cardFilter.value;
+    let visible  = 0;
+
+    rows.forEach(row => {
+      const type     = row.dataset.type      || '';
+      const category = row.dataset.category  || '';
+      const rowDate  = row.dataset.date      || '';
+      const rowCard  = row.dataset.card      || '';
+      const status   = row.dataset.status    || '';
+      const text     = row.textContent.toLowerCase();
+
+      const matchChip   = activeFilter === 'all' || type === activeFilter || category === activeFilter || status === activeFilter;
+      const matchSearch = !query || text.includes(query);
+      const matchDate   = !date  || rowDate === date;
+      const matchCard   = !card  || rowCard === card;
+
+      if (matchChip && matchSearch && matchDate && matchCard) {
+        row.classList.remove('hidden');
+        visible++;
+      } else {
+        row.classList.add('hidden');
+      }
+    });
+
+    shownCount.textContent = visible;
+    emptyState.classList.toggle('hidden', visible > 0);
+  }
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeFilter = chip.dataset.filter;
+      applyFilters();
+    });
+  });
+
+  searchBox.addEventListener('input', applyFilters);
+  dateFilter.addEventListener('change', applyFilters);
+  cardFilter.addEventListener('change', applyFilters);
+
+  // ---- CSV Export ----
+  function exportCSV() {
+    const visibleRows = rows.filter(r => !r.classList.contains('hidden'));
+    const headers = ['Merchant', 'Category', 'Card', 'Date', 'Status', 'Amount'];
+    const lines = [headers.join(',')];
+    visibleRows.forEach(row => {
+      const cells = Array.from(row.querySelectorAll('td')).map((td, i) => {
+        if (i === 0) return '"' + row.querySelector('.txn-name').textContent.trim() + '"';
+        return '"' + td.textContent.trim().replace(/[\n\r]+/g, ' ') + '"';
+      });
+      lines.push(cells.join(','));
+    });
+    const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'neobank-transactions-march-2025.csv';
+    a.click();
+  }
+</script>
+<script src="app.js"></script>
+</body>
+</html>
