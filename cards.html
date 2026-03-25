@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeoBank – Card Management</title>
+  <meta name="description" content="NeoBank Card Management – Manage your credit and debit cards in one place." />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Modal */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 999;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--bg-card);
+      border-radius: var(--radius-xl);
+      padding: 36px;
+      width: 100%; max-width: 440px;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(20px);
+      transition: transform 0.3s;
+    }
+    .modal-overlay.open .modal { transform: translateY(0); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .modal-title { font-size: 1.1rem; font-weight: 700; }
+    .modal-close { font-size: 20px; color: var(--text-muted); cursor: pointer; transition: var(--transition); }
+    .modal-close:hover { color: var(--text); }
+    .form-group { margin-bottom: 18px; }
+    .form-label { font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .form-input {
+      width: 100%; padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 14px; font-family: inherit;
+      background: var(--bg); color: var(--text);
+      transition: var(--transition);
+    }
+    .form-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(47,128,237,0.1); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-submit { width: 100%; margin-top: 8px; padding: 14px; font-size: 15px; border-radius: var(--radius-full); }
+  </style>
+</head>
+<body>
+
+<!-- ===== APP SHELL ===== -->
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-icon">💳</div>
+      <div>
+        <div class="sidebar-logo-text">NeoBank</div>
+        <div class="sidebar-logo-sub">Digital Banking</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Main</div>
+      <a href="dashboard.html" class="nav-item">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      <a href="dashboard.html" class="nav-item">
+        <span class="nav-icon">↔️</span> Transactions
+        <span class="nav-badge">8</span>
+      </a>
+      <a href="cards.html" class="nav-item active">
+        <span class="nav-icon">💳</span> Cards
+      </a>
+      <a href="dashboard.html" class="nav-item">
+        <span class="nav-icon">📊</span> Analytics
+      </a>
+      <div class="sidebar-section-label">Finance</div>
+      <a href="dashboard.html" class="nav-item">
+        <span class="nav-icon">🏦</span> Accounts
+      </a>
+      <a href="dashboard.html" class="nav-item">
+        <span class="nav-icon">💰</span> Savings
+      </a>
+      <a href="dashboard.html" class="nav-item">
+        <span class="nav-icon">📈</span> Investments
+      </a>
+      <div class="sidebar-section-label">Account</div>
+      <a href="dashboard.html" class="nav-item">
+        <span class="nav-icon">⚙️</span> Settings
+      </a>
+      <a href="index.html" class="nav-item">
+        <span class="nav-icon">🚪</span> Logout
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar">JD</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">John Doe</div>
+          <div class="sidebar-user-role">Premium Member</div>
+        </div>
+        <span style="color:rgba(255,255,255,0.3); font-size:14px;">⋮</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="app-main">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2>Card Management 💳</h2>
+        <p>Manage and monitor all your cards</p>
+      </div>
+      <div class="topbar-right">
+        <div class="search-bar">
+          <span>🔍</span>
+          Search cards…
+        </div>
+        <button class="notif-btn" id="themeToggle" title="Toggle dark mode">🌙</button>
+        <button class="notif-btn">
+          🔔
+          <span class="notif-dot"></span>
+        </button>
+        <div class="avatar" title="John Doe">JD</div>
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <div class="page-content">
+
+      <!-- Cards Header -->
+      <div class="cards-header animate-in">
+        <div>
+          <h1>Your Cards</h1>
+          <p>3 active cards · All systems operational</p>
+        </div>
+        <button class="btn btn-primary" id="addCardBtn" style="font-size: 14px;">
+          + Add New Card
+        </button>
+      </div>
+
+      <!-- Cards Grid -->
+      <div class="cards-grid animate-in-delay-1">
+
+        <!-- Card 1: Visa Platinum -->
+        <div class="credit-card blue-purple" title="Click to view details">
+          <div class="card-top">
+            <div>
+              <div class="card-bank">NeoBank</div>
+              <div class="card-type">Visa Platinum</div>
+            </div>
+            <div class="card-logo">💎</div>
+          </div>
+          <div class="card-chip"></div>
+          <div class="card-number">•••• •••• •••• 4291</div>
+          <div class="card-bottom">
+            <div>
+              <div class="card-holder-label">Card Holder</div>
+              <div class="card-holder-name">JOHN DOE</div>
+            </div>
+            <div>
+              <div class="card-expiry-label">Expires</div>
+              <div class="card-expiry-value">09/27</div>
+            </div>
+          </div>
+          <div class="card-network">
+            <div class="card-network-circle"></div>
+            <div class="card-network-circle"></div>
+          </div>
+          <!-- Active badge -->
+          <div style="position:absolute; top:16px; right:16px; background:rgba(34,197,94,0.25); color:#A7F3D0; font-size:10px; font-weight:700; padding:3px 9px; border-radius:99px; border:1px solid rgba(34,197,94,0.4);">● ACTIVE</div>
+        </div>
+
+        <!-- Card 2: Mastercard World -->
+        <div class="credit-card dark-teal" title="Click to view details">
+          <div class="card-top">
+            <div>
+              <div class="card-bank">NeoBank</div>
+              <div class="card-type">Mastercard World</div>
+            </div>
+            <div class="card-logo">🌍</div>
+          </div>
+          <div class="card-chip"></div>
+          <div class="card-number">•••• •••• •••• 7823</div>
+          <div class="card-bottom">
+            <div>
+              <div class="card-holder-label">Card Holder</div>
+              <div class="card-holder-name">JOHN DOE</div>
+            </div>
+            <div>
+              <div class="card-expiry-label">Expires</div>
+              <div class="card-expiry-value">12/26</div>
+            </div>
+          </div>
+          <div class="card-network">
+            <div class="card-network-circle"></div>
+            <div class="card-network-circle"></div>
+          </div>
+          <div style="position:absolute; top:16px; right:16px; background:rgba(34,197,94,0.25); color:#A7F3D0; font-size:10px; font-weight:700; padding:3px 9px; border-radius:99px; border:1px solid rgba(34,197,94,0.4);">● ACTIVE</div>
+        </div>
+
+        <!-- Card 3: Virtual Business -->
+        <div class="credit-card rose-gold" title="Click to view details">
+          <div class="card-top">
+            <div>
+              <div class="card-bank">NeoBank Business</div>
+              <div class="card-type">Virtual Card</div>
+            </div>
+            <div class="card-logo">⚡</div>
+          </div>
+          <div class="card-chip"></div>
+          <div class="card-number">•••• •••• •••• 5504</div>
+          <div class="card-bottom">
+            <div>
+              <div class="card-holder-label">Card Holder</div>
+              <div class="card-holder-name">JOHN DOE</div>
+            </div>
+            <div>
+              <div class="card-expiry-label">Expires</div>
+              <div class="card-expiry-value">06/25</div>
+            </div>
+          </div>
+          <div class="card-network">
+            <div class="card-network-circle"></div>
+            <div class="card-network-circle"></div>
+          </div>
+          <div style="position:absolute; top:16px; right:16px; background:rgba(251,191,36,0.25); color:#FDE68A; font-size:10px; font-weight:700; padding:3px 9px; border-radius:99px; border:1px solid rgba(251,191,36,0.4);">⚠ EXPIRING SOON</div>
+        </div>
+
+        <!-- Add New Card -->
+        <div class="add-card-btn" id="addCardBtn2">
+          <div class="add-card-icon">+</div>
+          <div class="add-card-label">Add New Card</div>
+          <div class="add-card-sub">Virtual, Debit, or Credit</div>
+        </div>
+      </div>
+
+      <!-- Card Details + Spending Limit Section -->
+      <div class="card-details-grid animate-in-delay-2">
+
+        <!-- Card 1 Details -->
+        <div class="card card-detail-card">
+          <div class="card-detail-title">
+            <div style="width:28px;height:28px;background:var(--gradient);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;">💎</div>
+            Visa Platinum Details
+          </div>
+
+          <div class="card-info-row">
+            <span class="card-info-label">Card Number</span>
+            <span class="card-info-value" style="font-family:monospace;">•••• •••• •••• 4291</span>
+          </div>
+          <div class="card-info-row">
+            <span class="card-info-label">Card Type</span>
+            <span class="card-info-value">Credit Card</span>
+          </div>
+          <div class="card-info-row">
+            <span class="card-info-label">Network</span>
+            <span class="card-info-value">Visa</span>
+          </div>
+          <div class="card-info-row">
+            <span class="card-info-label">Expiry Date</span>
+            <span class="card-info-value">09 / 2027</span>
+          </div>
+          <div class="card-info-row">
+            <span class="card-info-label">Status</span>
+            <span class="badge badge-green">● Active</span>
+          </div>
+          <div class="card-info-row">
+            <span class="card-info-label">Contactless</span>
+            <span class="card-info-value">✅ Enabled</span>
+          </div>
+
+          <div class="card-spending-limit">
+            <div class="limit-header">
+              <span style="font-size:12px; font-weight:600; color:var(--text-muted);">Monthly Spending Limit</span>
+              <span style="font-size:12px; font-weight:700;">$3,240 / $10,000</span>
+            </div>
+            <div class="limit-bar">
+              <div class="limit-fill" style="width: 32.4%;"></div>
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">32.4% used · $6,760 remaining</div>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="btn btn-outline" style="flex:1; border-radius:var(--radius-md); font-size:13px;">🔒 Freeze Card</button>
+            <button class="btn btn-primary" style="flex:1; border-radius:var(--radius-md); font-size:13px;">⚙ Manage</button>
+          </div>
+        </div>
+
+        <!-- Card 2 Details -->
+        <div class="card card-detail-card">
+          <div class="card-detail-title">
+            <div style="width:28px;height:28px;background:linear-gradient(135deg,#065F46,#059669);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;">🌍</div>
+            Mastercard World Details
+          </div>
+
+          <div class="card-info-row">
+            <span class="card-info-label">Card Number</span>
+            <span class="card-info-value" style="font-family:monospace;">•••• •••• •••• 7823</span>
+          </div>
+          <div class="card-info-row">
+            <span class="card-info-label">Card Type</span>
+            <span class="card-info-value">Debit Card</span>
+          </div>
+          <div class="card-info-row">
+            <span class="card-info-label">Network</span>
+            <span class="card-info-value">Mastercard</span>
+          </div>
+          <div class="card-info-row">
+            <span class="card-info-label">Expiry Date</span>
+            <span class="card-info-value">12 / 2026</span>
+          </div>
+          <div class="card-info-row">
+            <span class="card-info-label">Status</span>
+            <span class="badge badge-green">● Active</span>
+          </div>
+          <div class="card-info-row">
+            <span class="card-info-label">International</span>
+            <span class="card-info-value">✅ Enabled</span>
+          </div>
+
+          <div class="card-spending-limit">
+            <div class="limit-header">
+              <span style="font-size:12px; font-weight:600; color:var(--text-muted);">Monthly Spending Limit</span>
+              <span style="font-size:12px; font-weight:700;">$1,600 / $5,000</span>
+            </div>
+            <div class="limit-bar">
+              <div class="limit-fill" style="width: 32%; background: linear-gradient(90deg, #22C55E, #059669);"></div>
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">32% used · $3,400 remaining</div>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="btn btn-outline" style="flex:1; border-radius:var(--radius-md); font-size:13px;">🔒 Freeze Card</button>
+            <button class="btn btn-primary" style="flex:1; border-radius:var(--radius-md); font-size:13px;">⚙ Manage</button>
+          </div>
+        </div>
+
+        <!-- Recent Card Activity -->
+        <div class="card card-detail-card" style="grid-column: span 2;">
+          <div class="card-detail-title">📋 Recent Card Activity</div>
+          <table class="txn-table">
+            <thead>
+              <tr>
+                <th>Merchant</th>
+                <th>Card Used</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="txn-merchant">
+                    <div class="txn-merchant-icon" style="background:#FEF3C7;">☕</div>
+                    <div>
+                      <div class="txn-merchant-name">Starbucks</div>
+                      <div class="txn-merchant-cat">Food & Beverage</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span style="font-family:monospace;font-size:12px;">•••• 4291</span></td>
+                <td style="color:var(--text-muted);">Mar 25, 2025</td>
+                <td class="txn-amount debit">-$12.50</td>
+                <td><span class="badge badge-green">✔ Approved</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="txn-merchant">
+                    <div class="txn-merchant-icon" style="background:#EDE9FE;">🛍️</div>
+                    <div>
+                      <div class="txn-merchant-name">Amazon</div>
+                      <div class="txn-merchant-cat">Online Shopping</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span style="font-family:monospace;font-size:12px;">•••• 7823</span></td>
+                <td style="color:var(--text-muted);">Mar 23, 2025</td>
+                <td class="txn-amount debit">-$89.99</td>
+                <td><span class="badge badge-green">✔ Approved</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="txn-merchant">
+                    <div class="txn-merchant-icon" style="background:#FFE4E6;">⛽</div>
+                    <div>
+                      <div class="txn-merchant-name">Shell Gas Station</div>
+                      <div class="txn-merchant-cat">Fuel & Transport</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span style="font-family:monospace;font-size:12px;">•••• 4291</span></td>
+                <td style="color:var(--text-muted);">Mar 22, 2025</td>
+                <td class="txn-amount debit">-$55.60</td>
+                <td><span class="badge badge-green">✔ Approved</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="txn-merchant">
+                    <div class="txn-merchant-icon" style="background:#DCFCE7;">🎮</div>
+                    <div>
+                      <div class="txn-merchant-name">PlayStation Store</div>
+                      <div class="txn-merchant-cat">Entertainment</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span style="font-family:monospace;font-size:12px;">•••• 5504</span></td>
+                <td style="color:var(--text-muted);">Mar 20, 2025</td>
+                <td class="txn-amount debit">-$29.99</td>
+                <td><span class="badge" style="background:var(--red-light);color:#991B1B;">✕ Declined</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+  </div><!-- /app-main -->
+</div><!-- /app-shell -->
+
+<!-- Add Card Modal -->
+<div class="modal-overlay" id="addCardModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add New Card</div>
+      <button class="modal-close" id="closeModal">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Cardholder Name</label>
+      <input class="form-input" type="text" placeholder="JOHN DOE" value="JOHN DOE" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Card Number</label>
+      <input class="form-input" type="text" placeholder="1234 5678 9012 3456" maxlength="19" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Expiry Date</label>
+        <input class="form-input" type="text" placeholder="MM / YY" maxlength="7" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">CVV</label>
+        <input class="form-input" type="password" placeholder="•••" maxlength="3" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Card Type</label>
+      <select class="form-input">
+        <option>Visa Credit Card</option>
+        <option>Mastercard Debit</option>
+        <option>American Express</option>
+        <option>Virtual Card</option>
+      </select>
+    </div>
+    <button class="btn btn-primary form-submit">Add Card Securely 🔐</button>
+  </div>
+</div>
+
+<script>
+// Modal toggle
+const modal = document.getElementById('addCardModal');
+document.getElementById('addCardBtn').addEventListener('click', () => modal.classList.add('open'));
+document.getElementById('addCardBtn2').addEventListener('click', () => modal.classList.add('open'));
+document.getElementById('closeModal').addEventListener('click', () => modal.classList.remove('open'));
+modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
+</script>
+<script src="app.js"></script>
+</body>
+</html>

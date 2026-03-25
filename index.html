@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeoBank – Banking Made Simple & Secure</title>
+  <meta name="description" content="NeoBank is your modern digital banking platform. Track, manage, and grow your money effortlessly with bank-grade security." />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Landing-specific overrides */
+    body { background: var(--bg); }
+  </style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar" id="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="navbar-logo">
+      <div class="logo-icon">💳</div>
+      <div>
+        <div>NeoBank</div>
+      </div>
+    </a>
+
+    <div class="navbar-links">
+      <a href="#features" class="navbar-link">Features</a>
+      <a href="#stats" class="navbar-link">Why Us</a>
+      <a href="#cta" class="navbar-link">Pricing</a>
+    </div>
+
+    <div class="navbar-actions">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+      <a href="dashboard.html" class="btn btn-outline" style="border-radius: var(--radius-full); font-size: 14px; padding: 9px 20px;">Login</a>
+      <a href="dashboard.html" class="btn btn-primary">Get Started →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== MAIN ===== -->
+<main class="landing-main">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <!-- Left: Text -->
+        <div class="hero-content animate-in">
+          <div class="hero-eyebrow">
+            <span class="live-dot"></span>
+            Trusted by 2M+ users worldwide
+          </div>
+
+          <h1 class="heading-xl hero-title">
+            Banking Made<br>
+            <span class="gradient-text">Simple & Secure</span>
+          </h1>
+
+          <p class="hero-sub">
+            Track, manage, and grow your money effortlessly. One platform for all your financial needs — payments, savings, and insights.
+          </p>
+
+          <div class="hero-actions">
+            <a href="dashboard.html" class="btn btn-primary" style="font-size: 15px; padding: 14px 28px;">
+              Get Started Free ✦
+            </a>
+            <a href="dashboard.html" class="btn btn-outline" style="font-size: 15px; padding: 14px 28px;">
+              View Dashboard →
+            </a>
+          </div>
+
+          <div class="hero-trust">
+            <div class="hero-trust-avatars">
+              <div class="avatar">JD</div>
+              <div class="avatar" style="background: linear-gradient(135deg, #22C55E, #059669);">SR</div>
+              <div class="avatar" style="background: linear-gradient(135deg, #7C3AED, #A855F7);">KP</div>
+              <div class="avatar" style="background: linear-gradient(135deg, #F59E0B, #D97706);">AM</div>
+            </div>
+            <div class="hero-trust-text">
+              <strong>2,000,000+</strong> happy customers<br>
+              ⭐⭐⭐⭐⭐ 4.9/5 rating
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Mockup -->
+        <div class="hero-mockup animate-in-delay-1">
+          <div class="mockup-window">
+            <div class="mockup-topbar">
+              <div class="mockup-dot" style="background:#FF5F57"></div>
+              <div class="mockup-dot" style="background:#FFBD2E"></div>
+              <div class="mockup-dot" style="background:#28C840"></div>
+            </div>
+            <div class="mockup-body">
+              <!-- Mini Balance -->
+              <div class="mini-balance-card">
+                <div class="mini-balance-label">💳 Total Balance</div>
+                <div class="mini-balance-amount">$48,920.50</div>
+                <div class="mini-balance-row">
+                  <div class="mini-balance-stat">
+                    ↑ Income<br><strong>$6,250</strong>
+                  </div>
+                  <div class="mini-balance-stat">
+                    ↓ Expense<br><strong>$2,840</strong>
+                  </div>
+                  <div class="mini-balance-stat">
+                    📈 Savings<br><strong>+12.4%</strong>
+                  </div>
+                </div>
+              </div>
+              <!-- Mini Stats -->
+              <div class="mini-stats">
+                <div class="mini-stat-card">
+                  <div class="mini-stat-label">📥 Income</div>
+                  <div class="mini-stat-value green">+$6,250</div>
+                </div>
+                <div class="mini-stat-card">
+                  <div class="mini-stat-label">📤 Expenses</div>
+                  <div class="mini-stat-value red">-$2,840</div>
+                </div>
+              </div>
+              <!-- Mini Transactions -->
+              <div style="font-size:11px; font-weight:600; color: var(--text-muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:.06em;">Recent</div>
+              <div class="mini-txn">
+                <div class="mini-txn-left">
+                  <div class="mini-txn-icon" style="background:#DCFCE7;">🛒</div>
+                  <div>
+                    <div class="mini-txn-name">Grocery Store</div>
+                    <div class="mini-txn-date">Today, 2:30 PM</div>
+                  </div>
+                </div>
+                <div class="mini-txn-amount" style="color:var(--red)">-$45.00</div>
+              </div>
+              <div class="mini-txn">
+                <div class="mini-txn-left">
+                  <div class="mini-txn-icon" style="background:#EBF3FE;">💼</div>
+                  <div>
+                    <div class="mini-txn-name">Salary Credit</div>
+                    <div class="mini-txn-date">Mar 25, 9:00 AM</div>
+                  </div>
+                </div>
+                <div class="mini-txn-amount" style="color:var(--green)">+$6,250.00</div>
+              </div>
+              <div class="mini-txn">
+                <div class="mini-txn-left">
+                  <div class="mini-txn-icon" style="background:#FEF3C7;">☕</div>
+                  <div>
+                    <div class="mini-txn-name">Starbucks</div>
+                    <div class="mini-txn-date">Yesterday</div>
+                  </div>
+                </div>
+                <div class="mini-txn-amount" style="color:var(--red)">-$12.50</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Floating badges -->
+          <div style="position:absolute; top: -16px; right: -20px; background: var(--bg-card); border-radius: 12px; padding: 10px 14px; box-shadow: var(--shadow-md); border: 1px solid var(--border); font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px; animation: fadeInUp 0.5s 0.4s ease both; opacity: 0;">
+            🔒 <span style="color: var(--green);">Bank-grade Secure</span>
+          </div>
+          <div style="position:absolute; bottom: 20px; left: -24px; background: var(--bg-card); border-radius: 12px; padding: 10px 14px; box-shadow: var(--shadow-md); border: 1px solid var(--border); font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px; animation: fadeInUp 0.5s 0.6s ease both; opacity: 0;">
+            📈 <span>+12.4% <span style="color: var(--green)">this month</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">✦ Core Features</div>
+        <h2 class="heading-lg section-title">Everything you need to manage money</h2>
+        <p class="section-sub">From secure payments to real-time analytics — all in one beautifully simple platform.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon" style="background: var(--primary-light);">🔐</div>
+          <h3 class="feature-title">Secure Payments</h3>
+          <p class="feature-desc">End-to-end encrypted transactions with 256-bit SSL and real-time fraud detection. Your money is always protected.</p>
+          <div style="margin-top: 20px; display: flex; gap: 8px;">
+            <span class="badge badge-blue">PCI DSS</span>
+            <span class="badge badge-green">256-bit SSL</span>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background: #DCFCE7;">📊</div>
+          <h3 class="feature-title">Expense Tracking</h3>
+          <p class="feature-desc">Auto-categorize your spending, visualize trends with beautiful charts, and get AI-powered insights to save more.</p>
+          <div style="margin-top: 20px; display: flex; gap: 8px;">
+            <span class="badge badge-green">AI Powered</span>
+            <span class="badge" style="background:#FEF3C7; color: #92400E;">Smart Alerts</span>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background: #EDE9FE;">💳</div>
+          <h3 class="feature-title">Card Management</h3>
+          <p class="feature-desc">Manage multiple virtual and physical cards, set spending limits, freeze/unfreeze instantly, all at your fingertips.</p>
+          <div style="margin-top: 20px; display: flex; gap: 8px;">
+            <span class="badge" style="background:#EDE9FE; color:#5B21B6;">Virtual Cards</span>
+            <span class="badge badge-blue">Instant Freeze</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats-section" id="stats">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">✦ Our Numbers</div>
+        <h2 class="heading-lg section-title">Trusted at scale</h2>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value gradient-text">$48B+</div>
+          <div class="stat-label">Total Transactions Processed</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value gradient-text">2M+</div>
+          <div class="stat-label">Active Users Worldwide</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value gradient-text">99.9%</div>
+          <div class="stat-label">Uptime Guaranteed</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section" id="cta">
+    <div class="container">
+      <div class="cta-box">
+        <div class="cta-title" style="position:relative;z-index:1;">Ready to rethink banking?</div>
+        <p class="cta-sub" style="position:relative;z-index:1;">Join 2 million+ users already managing their finances smarter.</p>
+        <div style="display:flex; gap:16px; justify-content:center; position:relative;z-index:1; flex-wrap:wrap;">
+          <a href="dashboard.html" class="btn-white">Open Free Account →</a>
+          <a href="dashboard.html" class="btn" style="background:rgba(255,255,255,0.15); color:#fff; border:1.5px solid rgba(255,255,255,0.3);">
+            View Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="landing-footer">
+  <div class="container">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div class="logo-icon" style="width:28px;height:28px;font-size:13px;">💳</div>
+        <span style="color:rgba(255,255,255,0.8); font-weight:600;">NeoBank</span>
+      </div>
+      <div>© 2025 NeoBank Inc. · <a href="#">Privacy</a> · <a href="#">Terms</a> · <a href="#">Security</a></div>
+    </div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
