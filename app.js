@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ---- Animate balance counter ----
   const balanceEl = document.querySelector('.balance-amount');
   if (balanceEl) {
-    animateCounter(balanceEl, 0, 48920.5, 1400, '$', '.50');
+    animateCounter(balanceEl, 0, 48920.5, 1400, '₹', '.50');
   }
 
   // ---- Quick action ripple effect ----
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (cardNumberInput) {
     cardNumberInput.addEventListener('input', function () {
       let val = this.value.replace(/\D/g, '').substring(0, 16);
-      this.value = val.replace(/(.{4})/g, '$1 ').trim();
+      this.value = val.replace(/(.{4})/g, '₹1 ').trim();
     });
   }
 
@@ -157,9 +157,9 @@ function animateCounter(el, from, to, duration, prefix = '', suffix = '') {
     const value = from + (to - from) * eased;
     const formatted = value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
     if (suffix) {
-      el.innerHTML = `${prefix}${formatted}<span style="font-size:1.6rem; opacity:0.85;">${suffix}</span>`;
+      el.innerHTML = `₹{prefix}₹{formatted}<span style="font-size:1.6rem; opacity:0.85;">₹{suffix}</span>`;
     } else {
-      el.textContent = `${prefix}${formatted}`;
+      el.textContent = `₹{prefix}₹{formatted}`;
     }
     if (progress < 1) requestAnimationFrame(update);
     else el.innerHTML = originalHTML;
