@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NeoBank – AI Finance Advisor</title>
+  <meta name="description" content="NeoBank AI Finance Advisor – Smart, real-time investment and savings guidance with live charts."/>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* ===== AI Finance Page Layout ===== */
+    .ai-page { display: grid; grid-template-columns: 1fr 1fr; gap: 0; height: 100vh; overflow: hidden; }
+
+    /* ---- Left: Chat Panel ---- */
+    .ai-left {
+      display: flex; flex-direction: column;
+      background: rgba(15,23,42,0.96);
+      border-right: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(24px);
+    }
+    .ai-left-header {
+      padding: 18px 22px;
+      background: linear-gradient(135deg, #2F80ED, #6a11cb);
+      display: flex; align-items: center; gap: 12px;
+      flex-shrink: 0;
+    }
+    .ai-left-header .bot-avatar {
+      width: 46px; height: 46px; border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+    .ai-left-header h2 { color:#fff; font-size: 1rem; font-weight: 700; margin:0; }
+    .ai-left-header p  { color: rgba(255,255,255,0.65); font-size: 12px; margin:0; display: flex; align-items: center; gap: 5px; }
+    .ai-status-dot { width: 6px; height: 6px; background: #4ade80; border-radius: 50%; animation: blink2 2s infinite; }
+    @keyframes blink2 { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* Quick Actions */
+    .ai-quick-actions {
+      padding: 12px 16px;
+      display: flex; gap: 8px; flex-wrap: wrap;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
+    }
+    .qa-btn {
+      background: rgba(47,128,237,0.18);
+      border: 1px solid rgba(47,128,237,0.35);
+      color: #56CCF2; border-radius: 20px;
+      padding: 7px 14px; font-size: 12px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s; font-family: inherit;
+    }
+    .qa-btn:hover { background: rgba(47,128,237,0.4); color: #fff; transform: translateY(-1px); }
+    .qa-btn.active { background: linear-gradient(135deg,#2F80ED,#56CCF2); color:#fff; border-color: transparent; }
+
+    /* Messages */
+    .ai-messages-area {
+      flex: 1; overflow-y: auto; padding: 16px;
+      display: flex; flex-direction: column; gap: 12px;
+      scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent;
+    }
+    .ai-messages-area::-webkit-scrollbar { width: 4px; }
+    .ai-messages-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+
+    .msg { display: flex; gap: 10px; animation: msgIn 0.35s ease; }
+    @keyframes msgIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+    .msg.bot { align-self: flex-start; }
+    .msg.user { flex-direction: row-reverse; align-self: flex-end; }
+
+    .msg-avatar { width: 30px; height: 30px; border-radius: 50%; font-size: 14px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .msg.bot  .msg-avatar { background: linear-gradient(135deg,#2F80ED,#6a11cb); }
+    .msg.user .msg-avatar { background: linear-gradient(135deg,#22C55E,#059669); }
+
+    .msg-bubble {
+      max-width: 78%; padding: 11px 15px; border-radius: 16px;
+      font-size: 13px; line-height: 1.55; position: relative;
+    }
+    .msg.bot  .msg-bubble { background: rgba(255,255,255,0.07); color: #e2e8f0; border-radius: 4px 16px 16px 16px; border: 1px solid rgba(255,255,255,0.08); }
+    .msg.user .msg-bubble { background: linear-gradient(135deg,#2F80ED,#56CCF2); color:#fff; border-radius: 16px 4px 16px 16px; }
+    .msg-time { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 4px; }
+
+    /* Thinking dot */
+    .thinking { display: flex; gap: 4px; padding: 11px 15px; background: rgba(255,255,255,0.07); border-radius: 4px 16px 16px 16px; }
+    .thinking span { width: 6px; height: 6px; background: rgba(255,255,255,0.5); border-radius: 50%; animation: dot 1.2s ease-in-out infinite; }
+    .thinking span:nth-child(2){animation-delay:.2s} .thinking span:nth-child(3){animation-delay:.4s}
+    @keyframes dot { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-7px)} }
+
+    /* Input */
+    .ai-input-bar {
+      padding: 14px 16px; background: rgba(255,255,255,0.04);
+      border-top: 1px solid rgba(255,255,255,0.07);
+      display: flex; gap: 8px; flex-shrink: 0;
+    }
+    .ai-text-input {
+      flex: 1; background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 22px;
+      padding: 10px 16px; color: #fff; font-size: 13px; font-family: inherit; outline: none;
+      transition: border-color 0.2s;
+    }
+    .ai-text-input::placeholder { color: rgba(255,255,255,0.3); }
+    .ai-text-input:focus { border-color: #56CCF2; }
+    .ai-send { width: 42px; height: 42px; border-radius: 50%;
+      background: linear-gradient(135deg,#2F80ED,#56CCF2);
+      border: none; color: #fff; font-size: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.2s; flex-shrink: 0;
+    }
+    .ai-send:hover { transform: scale(1.1); }
+
+    /* ---- Right: Charts Panel ---- */
+    .ai-right {
+      display: flex; flex-direction: column; gap: 0;
+      background: rgba(10,15,30,0.9);
+      overflow-y: auto;
+    }
+    .charts-header {
+      padding: 18px 22px; border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+    .charts-header h3 { color:#fff; font-size: 1rem; font-weight: 700; margin: 0; }
+    .charts-header p  { color: rgba(255,255,255,0.5); font-size: 12px; margin: 0; }
+    .live-badge {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3);
+      color: #4ade80; border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 700;
+    }
+
+    /* Chart Cards */
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: rgba(255,255,255,0.05); flex: 1; }
+    .chart-panel {
+      background: rgba(15,23,42,0.85);
+      padding: 16px 18px; display: flex; flex-direction: column; gap: 8px;
+    }
+    .chart-panel h4 { color: rgba(255,255,255,0.85); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin: 0; }
+    .chart-panel p  { color: rgba(255,255,255,0.4); font-size: 11px; margin: 0; }
+    .chart-container { position: relative; flex: 1; min-height: 150px; }
+
+    /* Savings Progress */
+    .savings-section {
+      padding: 16px 18px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      background: rgba(15,23,42,0.85);
+      flex-shrink: 0;
+    }
+    .savings-section h4 { color: rgba(255,255,255,0.85); font-size: 12px; font-weight:700; text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 12px; }
+    .savings-goal {
+      display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px;
+    }
+    .savings-label-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+    .savings-goal-name { color: #e2e8f0; font-weight: 600; }
+    .savings-goal-pct  { color: #56CCF2; font-weight: 700; }
+    .savings-bar { height: 8px; background: rgba(255,255,255,0.08); border-radius: 99px; overflow: hidden; }
+    .savings-fill { height: 100%; border-radius: 99px; transition: width 1.2s cubic-bezier(0.4,0,0.2,1); }
+
+    /* Insight chips that appear after AI response */
+    .ai-insight-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .insight-chip {
+      background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.2);
+      color: #fbbf24; border-radius: 20px; padding: 4px 10px; font-size: 11px; font-weight: 600;
+    }
+
+    /* Back link */
+    .back-link {
+      position: fixed; top: 16px; left: 16px; z-index: 999;
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18);
+      color: #fff; border-radius: 22px; padding: 8px 16px; font-size: 13px; font-weight: 600;
+      text-decoration: none; backdrop-filter: blur(10px); transition: all 0.2s;
+    }
+    .back-link:hover { background: rgba(255,255,255,0.2); }
+
+    @media(max-width: 900px) {
+      .ai-page { grid-template-columns: 1fr; grid-template-rows: 50vh 50vh; }
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;overflow:hidden;">
+
+<a href="dashboard.html" class="back-link">← Dashboard</a>
+
+<div class="ai-page">
+
+  <!-- ====== LEFT PANEL: AI Chat ====== -->
+  <div class="ai-left">
+    <div class="ai-left-header">
+      <div class="bot-avatar">🤖</div>
+      <div>
+        <h2>NeoAI Finance Advisor</h2>
+        <p><span class="ai-status-dot"></span> Online · Analyzing your portfolio</p>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="ai-quick-actions">
+      <button class="qa-btn active" data-action="analyze" onclick="quickAction(this,'analyze')">📊 Analyze Spending</button>
+      <button class="qa-btn" data-action="invest"  onclick="quickAction(this,'invest')">📈 Suggest Investment</button>
+      <button class="qa-btn" data-action="savings" onclick="quickAction(this,'savings')">🏦 Track Savings</button>
+      <button class="qa-btn" data-action="risk"    onclick="quickAction(this,'risk')">🛡️ Risk Profile</button>
+      <button class="qa-btn" data-action="stocks"  onclick="quickAction(this,'stocks')">📉 Best Stocks</button>
+    </div>
+
+    <!-- Messages -->
+    <div class="ai-messages-area" id="aiMsgs"></div>
+
+    <!-- Input -->
+    <div class="ai-input-bar">
+      <input class="ai-text-input" id="aiInput" type="text" placeholder="Ask NeoAI about your finances…" autocomplete="off"/>
+      <button class="ai-send" onclick="sendMsg()" title="Send">➤</button>
+    </div>
+  </div>
+
+  <!-- ====== RIGHT PANEL: Live Charts ====== -->
+  <div class="ai-right">
+    <div class="charts-header">
+      <div>
+        <h3>📊 Live Financial Overview</h3>
+        <p>Updated in real-time as you chat</p>
+      </div>
+      <div class="live-badge"><span class="ai-status-dot"></span> LIVE</div>
+    </div>
+
+    <div class="charts-grid">
+      <!-- Income vs Expenses Line Chart -->
+      <div class="chart-panel">
+        <h4>📈 Income vs Expenses</h4>
+        <p id="lineSubtitle">Last 6 months trend</p>
+        <div class="chart-container"><canvas id="lineChart"></canvas></div>
+      </div>
+
+      <!-- Spending Pie Chart -->
+      <div class="chart-panel">
+        <h4>🍩 Spending Breakdown</h4>
+        <p id="pieSubtitle">By category · March 2025</p>
+        <div class="chart-container"><canvas id="pieChart"></canvas></div>
+      </div>
+
+      <!-- Investment Bar Chart -->
+      <div class="chart-panel">
+        <h4>💼 Investment Comparison</h4>
+        <p id="barSubtitle">Returns vs Risk level</p>
+        <div class="chart-container"><canvas id="barChart"></canvas></div>
+      </div>
+
+      <!-- Risk Doughnut -->
+      <div class="chart-panel">
+        <h4>🛡️ Portfolio Allocation</h4>
+        <p id="donutSubtitle">Risk diversification</p>
+        <div class="chart-container"><canvas id="donutChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Savings Goals -->
+    <div class="savings-section">
+      <h4>🎯 Savings Goals</h4>
+      <div id="savingsGoals">
+        <div class="savings-goal">
+          <div class="savings-label-row">
+            <span class="savings-goal-name">Emergency Fund</span>
+            <span class="savings-goal-pct" id="emergencyPct">74%</span>
+          </div>
+          <div class="savings-bar"><div class="savings-fill" id="emergencyBar" style="width:74%;background:linear-gradient(90deg,#2F80ED,#56CCF2);"></div></div>
+        </div>
+        <div class="savings-goal">
+          <div class="savings-label-row">
+            <span class="savings-goal-name">Vacation Fund</span>
+            <span class="savings-goal-pct" id="vacationPct">42%</span>
+          </div>
+          <div class="savings-bar"><div class="savings-fill" id="vacationBar" style="width:42%;background:linear-gradient(90deg,#7C3AED,#A855F7);"></div></div>
+        </div>
+        <div class="savings-goal">
+          <div class="savings-label-row">
+            <span class="savings-goal-name">Investment Portfolio</span>
+            <span class="savings-goal-pct" id="investPct">88%</span>
+          </div>
+          <div class="savings-bar"><div class="savings-fill" id="investBar" style="width:88%;background:linear-gradient(90deg,#22C55E,#059669);"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ========================
+   CHART INITIALIZATION
+======================== */
+const CHART_DEFAULTS = {
+  color: 'rgba(255,255,255,0.7)',
+  borderColor: 'rgba(255,255,255,0.1)',
+  responsive: true,
+  maintainAspectRatio: false,
+};
+Chart.defaults.color = 'rgba(255,255,255,0.6)';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.08)';
+Chart.defaults.plugins.legend.labels.boxWidth = 10;
+Chart.defaults.plugins.legend.labels.font = { size: 11, family: 'Inter' };
+
+/* ----- Line Chart ----- */
+const lineCtx = document.getElementById('lineChart').getContext('2d');
+const lineGrad1 = lineCtx.createLinearGradient(0,0,0,200);
+lineGrad1.addColorStop(0,'rgba(34,197,94,0.35)'); lineGrad1.addColorStop(1,'rgba(34,197,94,0)');
+const lineGrad2 = lineCtx.createLinearGradient(0,0,0,200);
+lineGrad2.addColorStop(0,'rgba(47,128,237,0.35)'); lineGrad2.addColorStop(1,'rgba(47,128,237,0)');
+
+const lineChart = new Chart(lineCtx, {
+  type: 'line',
+  data: {
+    labels: ['Oct','Nov','Dec','Jan','Feb','Mar'],
+    datasets: [
+      { label:'Income', data:[4200,4800,5100,5500,5900,6250], borderColor:'#22C55E', backgroundColor:lineGrad1, tension:0.4, fill:true, pointRadius:4, pointHoverRadius:7, borderWidth:2.5 },
+      { label:'Expenses', data:[3100,2900,3400,2800,3000,2840], borderColor:'#2F80ED', backgroundColor:lineGrad2, tension:0.4, fill:true, pointRadius:4, pointHoverRadius:7, borderWidth:2.5 },
+    ]
+  },
+  options: { ...CHART_DEFAULTS, plugins:{ legend:{ position:'top' } }, scales:{ x:{ grid:{ color:'rgba(255,255,255,0.05)' } }, y:{ grid:{ color:'rgba(255,255,255,0.05)' }, ticks:{ callback: v => '₹'+v/1000+'k' } } } }
+});
+
+/* ----- Pie Chart ----- */
+const pieChart = new Chart(document.getElementById('pieChart').getContext('2d'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Groceries','Dining','Transport','Subscriptions','Healthcare','Savings'],
+    datasets: [{ data:[22,18,10,4,8,38], backgroundColor:['#2F80ED','#F59E0B','#7C3AED','#EF4444','#06B6D4','#22C55E'], borderWidth:2, borderColor:'rgba(15,23,42,0.9)', hoverOffset:12 }]
+  },
+  options: { ...CHART_DEFAULTS, plugins:{ legend:{ position:'right' } }, cutout:'62%' }
+});
+
+/* ----- Bar Chart ----- */
+const barChart = new Chart(document.getElementById('barChart').getContext('2d'), {
+  type: 'bar',
+  data: {
+    labels: ['FD (7.5%)','Index Fund','Large Cap','Mid Cap','Small Cap','Crypto'],
+    datasets: [
+      { label:'Expected Return %', data:[7.5,12,15,20,28,45], backgroundColor:'rgba(47,128,237,0.7)', borderRadius:6, borderWidth:0 },
+      { label:'Risk Score /10',    data:[1,3,4,6,8,10],  backgroundColor:'rgba(239,68,68,0.6)',  borderRadius:6, borderWidth:0 }
+    ]
+  },
+  options: { ...CHART_DEFAULTS, plugins:{ legend:{ position:'top' } }, scales:{ x:{ grid:{ display:false } }, y:{ grid:{ color:'rgba(255,255,255,0.05)' } } } }
+});
+
+/* ----- Donut Portfolio Chart ----- */
+const donutChart = new Chart(document.getElementById('donutChart').getContext('2d'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Low Risk (FD/Bonds)','Medium (Mutual Funds)','High (Stocks)'],
+    datasets: [{ data:[40,40,20], backgroundColor:['#22C55E','#2F80ED','#EF4444'], borderWidth:2, borderColor:'rgba(15,23,42,0.9)', hoverOffset:10 }]
+  },
+  options: { ...CHART_DEFAULTS, plugins:{ legend:{ position:'right' } }, cutout:'55%' }
+});
+
+/* ========================
+   AI CHAT ENGINE
+======================== */
+const RESPONSES = {
+  analyze: {
+    msg: `📊 You spent <strong>₹2,840</strong> this month — 3.1% less than last month! 🎉 Groceries (22%) and Dining (18%) are your top 2 categories.`,
+    charts: () => {
+      animatePie([22,18,10,4,8,38]);
+      document.getElementById('pieSubtitle').textContent = 'Spending by category · March 2025';
+    },
+    insights: ['↓ 3.1% less this month','⚠️ Dining over budget','✅ Transport on track']
+  },
+  invest: {
+    msg: `📈 Based on your ₹5,460 free savings, I suggest: <strong>₹2,000</strong> → Index Fund (12% returns), <strong>₹1,500</strong> → FD (safe), <strong>₹500</strong> → Mid-cap SIP.`,
+    charts: () => {
+      animateBar([7.5,12,15,20,28,45],[1,3,4,6,8,10]);
+      document.getElementById('barSubtitle').textContent = 'Returns vs Risk · Personalised';
+    },
+    insights: ['📈 SIP from ₹500/mo','🏦 FD earns ₹112 risk-free','💡 Index Fund best for medium risk']
+  },
+  savings: {
+    msg: `🏦 You're saving <strong>₹5,460/month</strong> (87.4% of income). Your Emergency Fund reaches its goal in <strong>3 months</strong>. Keep going! 💪`,
+    charts: () => {
+      animateSavings(74, 42, 88);
+    },
+    insights: ['Emergency Fund: 74% done','Vacation goal: 3 months away','Portfolio: almost at target!']
+  },
+  risk: {
+    msg: `🛡️ Your risk score is <strong>Medium (6/10)</strong>. Portfolio: 40% Low risk, 40% Medium, 20% High. Well balanced!`,
+    charts: () => {
+      animateDonut([40,40,20]);
+      document.getElementById('donutSubtitle').textContent = 'Your personalised allocation';
+    },
+    insights: ['🟢 40% in safe assets','🔵 40% growth funds','🔴 20% high-growth stocks']
+  },
+  stocks: {
+    msg: `📉 Top picks for you: <strong>Reliance</strong> (stable), <strong>Infosys</strong> (IT leader), <strong>HDFC Bank</strong> (banking). Start SIP at ₹500/mo each.`,
+    charts: () => {
+      animateBar([14,22,18,28,35,45],[2,4,4,6,7,9]);
+      document.getElementById('barSubtitle').textContent = 'Stock returns vs risk · Top picks';
+      lineChart.data.labels = ['Reliance','Infosys','HDFC Bk','Mirae','Parag P','Nippon'];
+      lineChart.data.datasets[0].data = [14,22,18,28,35,45];
+      lineChart.data.datasets[0].label = 'Returns %';
+      lineChart.data.datasets[1].data = [2,4,4,6,7,9];
+      lineChart.data.datasets[1].label = 'Risk Score';
+      lineChart.update('active');
+    },
+    insights: ['💼 HDFC Bank: low volatility','📈 Infosys: strong tech growth','⚡ Parag Parikh: best flexi cap']
+  },
+  balance: {
+    msg: `💰 Your current balance is <strong>₹48,920</strong>. Income: ₹6,250 | Expenses: ₹2,840 | Net savings: <strong>+₹5,460</strong> this month. 🎉`,
+    charts: () => {
+      animateLine([4200,4800,5100,5500,5900,6250],[3100,2900,3400,2800,3000,2840]);
+      document.getElementById('lineSubtitle').textContent = 'Your income vs expenses · 6 months';
+    },
+    insights: ['Income ↑ 8.2% trending up','Expenses ↓ 3.1% this month','Net savings: ₹5,460']
+  },
+};
+
+const DEFAULT_RESP = {
+  msg: `🤔 Try asking: <strong>balance</strong>, <strong>analyze spending</strong>, <strong>suggest investment</strong>, <strong>savings goals</strong> or <strong>stocks</strong>!`,
+  charts: null,
+  insights: []
+};
+
+function resolve(input) {
+  const q = input.toLowerCase();
+  if (q.match(/analyz|spend|breakdown/)) return RESPONSES.analyze;
+  if (q.match(/invest|sip|fund|mutual/))  return RESPONSES.invest;
+  if (q.match(/sav|goal/))               return RESPONSES.savings;
+  if (q.match(/risk|profile|alloc/))     return RESPONSES.risk;
+  if (q.match(/stock|share|equity|reliance|infosys/)) return RESPONSES.stocks;
+  if (q.match(/balance|total|how much/)) return RESPONSES.balance;
+  return DEFAULT_RESP;
+}
+
+/* Chart Animators */
+function animatePie(data) {
+  pieChart.data.datasets[0].data = data;
+  pieChart.update('active');
+}
+function animateBar(returns, risk) {
+  barChart.data.datasets[0].data = returns;
+  barChart.data.datasets[1].data = risk;
+  barChart.update('active');
+}
+function animateDonut(data) {
+  donutChart.data.datasets[0].data = data;
+  donutChart.update('active');
+}
+function animateLine(income, expenses) {
+  lineChart.data.datasets[0].data = income;
+  lineChart.data.datasets[1].data = expenses;
+  lineChart.data.labels = ['Oct','Nov','Dec','Jan','Feb','Mar'];
+  lineChart.data.datasets[0].label = 'Income';
+  lineChart.data.datasets[1].label = 'Expenses';
+  lineChart.update('active');
+}
+function animateSavings(e, v, i) {
+  document.getElementById('emergencyBar').style.width = e+'%';
+  document.getElementById('emergencyPct').textContent = e+'%';
+  document.getElementById('vacationBar').style.width   = v+'%';
+  document.getElementById('vacationPct').textContent   = v+'%';
+  document.getElementById('investBar').style.width    = i+'%';
+  document.getElementById('investPct').textContent    = i+'%';
+}
+
+/* Message Handling */
+const msgsEl = document.getElementById('aiMsgs');
+
+function getTime() {
+  return new Date().toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', hour12:true });
+}
+
+function addMsg(text, role, insights) {
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const ava = role==='bot' ? '🤖' : '👤';
+  const chips = (insights && insights.length) ? `<div class="ai-insight-chips">${insights.map(i=>`<span class="insight-chip">${i}</span>`).join('')}</div>` : '';
+  div.innerHTML = `
+    <div class="msg-avatar">${ava}</div>
+    <div>
+      <div class="msg-bubble">${text}${chips}</div>
+      <div class="msg-time">${getTime()}</div>
+    </div>`;
+  msgsEl.appendChild(div);
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+}
+
+function showThinking() {
+  const d = document.createElement('div');
+  d.className = 'msg bot'; d.id = 'thinking';
+  d.innerHTML = `<div class="msg-avatar">🤖</div><div class="thinking"><span></span><span></span><span></span></div>`;
+  msgsEl.appendChild(d); msgsEl.scrollTop = msgsEl.scrollHeight;
+}
+function removeThinking() { const t = document.getElementById('thinking'); if(t) t.remove(); }
+
+function sendMsg(text) {
+  const val = text || document.getElementById('aiInput').value.trim();
+  if (!val) return;
+  document.getElementById('aiInput').value = '';
+  addMsg(val, 'user');
+  showThinking();
+  const resp = resolve(val);
+  setTimeout(() => {
+    removeThinking();
+    if (resp.charts) resp.charts();
+    addMsg(resp.msg, 'bot', resp.insights);
+  }, 700 + Math.random() * 600);
+}
+
+function quickAction(btn, action) {
+  document.querySelectorAll('.qa-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const labels = { analyze:'Analyze my spending', invest:'Suggest investment options', savings:'Track my savings goals', risk:'Show my risk profile', stocks:'Show best stock picks' };
+  sendMsg(labels[action]);
+}
+
+/* Input enter key */
+document.getElementById('aiInput').addEventListener('keydown', e => { if(e.key==='Enter') sendMsg(); });
+
+/* Boot message */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    addMsg(`👋 Hi Viraj! I'm <strong>NeoAI</strong>, your personal finance advisor.<br>Your balance is <strong>₹48,920</strong>. Tap a quick action or ask me anything! 💰`, 'bot', ['Balance: ₹48,920','Income ↑ 8.2%','Savings rate: 87.4%']);
+    RESPONSES.analyze.charts();
+  }, 600);
+});
+</script>
+</body>
+</html>
