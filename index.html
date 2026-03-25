@@ -1,14 +1,172 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>NeoBank – Banking Made Simple & Secure</title>
-  <meta name="description" content="NeoBank is your modern digital banking platform. Track, manage, and grow your money effortlessly with bank-grade security." />
-  <link rel="stylesheet" href="style.css" />
+  <meta name="description" content="NeoBank is your modern digital banking platform. Track, manage, and grow your money effortlessly with bank-grade security."/>
+  <link rel="stylesheet" href="style.css"/>
   <style>
-    /* Landing-specific overrides */
-    body { background: var(--bg); }
+    /* ===== LANDING-SPECIFIC EXTRAS ===== */
+
+    /* How It Works */
+    .how-section { padding: 90px 0; }
+    .steps-grid {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 32px;
+      position: relative;
+    }
+    .steps-grid::before {
+      content:''; position:absolute; top:36px; left:15%; right:15%;
+      height:2px; background: linear-gradient(90deg,var(--primary),var(--purple));
+      z-index:0;
+    }
+    .step-card {
+      background:var(--bg-card); border:1.5px solid var(--border);
+      border-radius:var(--radius-xl); padding:32px 28px; text-align:center;
+      position:relative; z-index:1; transition:var(--transition);
+    }
+    .step-card:hover { transform:translateY(-6px); box-shadow:var(--shadow-lg); border-color:var(--primary); }
+    .step-num {
+      width:56px; height:56px; border-radius:50%;
+      background:var(--gradient); color:#fff;
+      font-family:'Poppins',sans-serif; font-size:1.3rem; font-weight:800;
+      display:flex; align-items:center; justify-content:center;
+      margin:0 auto 20px; box-shadow:var(--shadow-blue);
+    }
+    .step-title { font-size:1rem; font-weight:700; margin-bottom:10px; }
+    .step-desc  { font-size:13px; color:var(--text-muted); line-height:1.65; }
+
+    /* Testimonials */
+    .testimonials { padding:90px 0; background:var(--bg-card); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+    .testi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+    .testi-card {
+      background:var(--bg); border:1.5px solid var(--border); border-radius:var(--radius-xl);
+      padding:28px; transition:var(--transition);
+    }
+    .testi-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-md); border-color:var(--primary); }
+    .testi-stars { color:#F59E0B; font-size:14px; margin-bottom:14px; }
+    .testi-quote { font-size:14px; line-height:1.7; color:var(--text-muted); margin-bottom:20px; font-style:italic; }
+    .testi-author { display:flex; align-items:center; gap:12px; }
+    .testi-name  { font-size:13px; font-weight:700; }
+    .testi-role  { font-size:12px; color:var(--text-muted); }
+
+    /* Pricing */
+    .pricing-section { padding:90px 0; }
+    .pricing-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:48px; }
+    .pricing-card {
+      background:var(--bg-card); border:1.5px solid var(--border);
+      border-radius:var(--radius-xl); padding:36px 28px;
+      transition:var(--transition); position:relative;
+    }
+    .pricing-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-lg); }
+    .pricing-card.popular {
+      border-color:var(--primary); background:var(--gradient);
+      color:#fff; transform:scale(1.04);
+    }
+    .pricing-card.popular:hover { transform:scale(1.06) translateY(-4px); }
+    .popular-tag {
+      position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+      background:#F59E0B; color:#fff; font-size:11px; font-weight:700;
+      padding:4px 14px; border-radius:99px; white-space:nowrap;
+    }
+    .plan-name  { font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; opacity:.75; margin-bottom:12px; }
+    .plan-price {
+      font-family:'Poppins',sans-serif; font-size:2.8rem; font-weight:800;
+      line-height:1; margin-bottom:4px;
+    }
+    .plan-period { font-size:13px; opacity:.7; margin-bottom:24px; }
+    .plan-features { list-style:none; margin-bottom:32px; display:flex; flex-direction:column; gap:11px; }
+    .plan-features li { font-size:13px; display:flex; align-items:center; gap:9px; }
+    .plan-features li::before { content:'✓'; font-weight:700; color:var(--green); }
+    .pricing-card.popular .plan-features li::before { color:#A7F3D0; }
+    .pricing-card.popular .plan-features li { color:rgba(255,255,255,.9); }
+    .plan-btn { width:100%; padding:13px; border-radius:var(--radius-full); font-size:14px; font-weight:700; transition:var(--transition); }
+    .plan-btn-outline { border:2px solid var(--border); color:var(--text); background:transparent; }
+    .plan-btn-outline:hover { border-color:var(--primary); color:var(--primary); background:var(--primary-light); }
+    .plan-btn-white { background:#fff; color:var(--primary); border:none; }
+    .plan-btn-white:hover { background:#f0f7ff; transform:translateY(-1px); }
+
+    /* FAQ */
+    .faq-section { padding:90px 0; background:var(--bg-card); border-top:1px solid var(--border); }
+    .faq-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:48px; }
+    .faq-item {
+      background:var(--bg); border:1.5px solid var(--border);
+      border-radius:var(--radius-lg); overflow:hidden; transition:var(--transition);
+    }
+    .faq-item:hover { border-color:var(--primary); }
+    .faq-question {
+      padding:18px 22px; font-size:14px; font-weight:600;
+      display:flex; justify-content:space-between; align-items:center;
+      cursor:pointer; user-select:none;
+    }
+    .faq-arrow { transition:transform .3s; font-size:12px; color:var(--text-muted); }
+    .faq-answer { padding:0 22px; font-size:13px; color:var(--text-muted); line-height:1.7; max-height:0; overflow:hidden; transition:max-height .35s ease, padding .35s ease; }
+    .faq-item.open .faq-answer { max-height:200px; padding:0 22px 18px; }
+    .faq-item.open .faq-arrow { transform:rotate(180deg); color:var(--primary); }
+    .faq-item.open .faq-question { color:var(--primary); }
+    .faq-item.open { border-color:var(--primary); background:var(--primary-light); }
+
+    /* Security section */
+    .security-section { padding:90px 0; }
+    .security-grid { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; }
+    .security-badges { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:24px; }
+    .sec-badge {
+      background:var(--bg-card); border:1.5px solid var(--border);
+      border-radius:var(--radius-md); padding:16px; display:flex;
+      align-items:center; gap:10px; transition:var(--transition);
+    }
+    .sec-badge:hover { border-color:var(--primary); box-shadow:var(--shadow-md); }
+    .sec-badge-icon { font-size:22px; }
+    .sec-badge-text { font-size:13px; font-weight:600; }
+    .sec-badge-sub  { font-size:11px; color:var(--text-muted); }
+
+    /* App download banner */
+    .app-section {
+      padding:80px 0;
+      background:linear-gradient(135deg,#0F172A 0%,#1e3a6e 50%,#2F80ED 100%);
+      color:#fff;
+    }
+    .app-inner { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; }
+    .app-store-btns { display:flex; gap:14px; margin-top:28px; flex-wrap:wrap; }
+    .app-store-btn {
+      display:flex; align-items:center; gap:10px;
+      background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25);
+      border-radius:var(--radius-md); padding:12px 20px;
+      color:#fff; transition:var(--transition); cursor:pointer;
+    }
+    .app-store-btn:hover { background:rgba(255,255,255,.2); transform:translateY(-2px); }
+    .app-store-btn-icon { font-size:22px; }
+    .app-store-btn-text { font-size:11px; opacity:.75; }
+    .app-store-btn-name { font-size:15px; font-weight:700; display:block; }
+    .app-phone-mock {
+      background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.15);
+      border-radius:var(--radius-xl); padding:28px; text-align:center;
+      font-size:64px;
+    }
+
+    /* Footer */
+    .footer {
+      background:var(--bg-sidebar); padding:60px 0 32px;
+    }
+    .footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:40px; margin-bottom:48px; }
+    .footer-brand-desc { font-size:13px; color:rgba(255,255,255,.5); line-height:1.7; margin-top:12px; max-width:260px; }
+    .footer-col-title { font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:rgba(255,255,255,.35); font-weight:700; margin-bottom:16px; }
+    .footer-links { display:flex; flex-direction:column; gap:10px; }
+    .footer-link { font-size:13px; color:rgba(255,255,255,.55); transition:var(--transition); }
+    .footer-link:hover { color:#fff; }
+    .footer-bottom {
+      display:flex; justify-content:space-between; align-items:center;
+      padding-top:24px; border-top:1px solid rgba(255,255,255,.08);
+      font-size:12px; color:rgba(255,255,255,.4); flex-wrap:wrap; gap:12px;
+    }
+    .footer-socials { display:flex; gap:12px; }
+    .social-btn {
+      width:34px; height:34px; border-radius:var(--radius-sm);
+      background:rgba(255,255,255,.08); color:rgba(255,255,255,.6);
+      display:flex; align-items:center; justify-content:center; font-size:15px;
+      transition:var(--transition); cursor:pointer;
+    }
+    .social-btn:hover { background:rgba(255,255,255,.18); color:#fff; }
   </style>
 </head>
 <body>
@@ -18,72 +176,51 @@
   <div class="container navbar-inner">
     <a href="index.html" class="navbar-logo">
       <div class="logo-icon">💳</div>
-      <div>
-        <div>NeoBank</div>
-      </div>
+      <div>NeoBank</div>
     </a>
-
     <div class="navbar-links">
-      <a href="#features" class="navbar-link">Features</a>
-      <a href="#stats" class="navbar-link">Why Us</a>
-      <a href="#cta" class="navbar-link">Pricing</a>
+      <a href="#features"     class="navbar-link">Features</a>
+      <a href="#how-it-works" class="navbar-link">How It Works</a>
+      <a href="#pricing"      class="navbar-link">Pricing</a>
+      <a href="#faq"          class="navbar-link">FAQ</a>
     </div>
-
     <div class="navbar-actions">
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
-      <a href="dashboard.html" class="btn btn-outline" style="border-radius: var(--radius-full); font-size: 14px; padding: 9px 20px;">Login</a>
-      <a href="dashboard.html" class="btn btn-primary">Get Started →</a>
+      <a href="dashboard.html" class="btn btn-outline" style="border-radius:var(--radius-full);font-size:14px;padding:9px 20px;">Log In</a>
+      <a href="dashboard.html" class="btn btn-primary">Get Started Free →</a>
     </div>
   </div>
 </nav>
 
-<!-- ===== MAIN ===== -->
 <main class="landing-main">
 
-  <!-- HERO -->
+  <!-- ===== HERO ===== -->
   <section class="hero">
     <div class="container">
       <div class="hero-grid">
-        <!-- Left: Text -->
         <div class="hero-content animate-in">
-          <div class="hero-eyebrow">
-            <span class="live-dot"></span>
-            Trusted by 2M+ users worldwide
-          </div>
-
+          <div class="hero-eyebrow"><span class="live-dot"></span>Now live in 40+ countries</div>
           <h1 class="heading-xl hero-title">
-            Banking Made<br>
-            <span class="gradient-text">Simple & Secure</span>
+            Banking Made<br><span class="gradient-text">Simple & Secure</span>
           </h1>
-
-          <p class="hero-sub">
-            Track, manage, and grow your money effortlessly. One platform for all your financial needs — payments, savings, and insights.
-          </p>
-
+          <p class="hero-sub">Track, manage, and grow your money effortlessly. One platform for all your financial needs — payments, savings, investments, and real-time insights.</p>
           <div class="hero-actions">
-            <a href="dashboard.html" class="btn btn-primary" style="font-size: 15px; padding: 14px 28px;">
-              Get Started Free ✦
-            </a>
-            <a href="dashboard.html" class="btn btn-outline" style="font-size: 15px; padding: 14px 28px;">
-              View Dashboard →
-            </a>
+            <a href="dashboard.html" class="btn btn-primary" style="font-size:15px;padding:14px 28px;">Open Free Account ✦</a>
+            <a href="#how-it-works" class="btn btn-outline" style="font-size:15px;padding:14px 28px;">See How It Works</a>
           </div>
-
           <div class="hero-trust">
             <div class="hero-trust-avatars">
               <div class="avatar">JD</div>
-              <div class="avatar" style="background: linear-gradient(135deg, #22C55E, #059669);">SR</div>
-              <div class="avatar" style="background: linear-gradient(135deg, #7C3AED, #A855F7);">KP</div>
-              <div class="avatar" style="background: linear-gradient(135deg, #F59E0B, #D97706);">AM</div>
+              <div class="avatar" style="background:linear-gradient(135deg,#22C55E,#059669)">SR</div>
+              <div class="avatar" style="background:linear-gradient(135deg,#7C3AED,#A855F7)">KP</div>
+              <div class="avatar" style="background:linear-gradient(135deg,#F59E0B,#D97706)">AM</div>
             </div>
             <div class="hero-trust-text">
-              <strong>2,000,000+</strong> happy customers<br>
-              ⭐⭐⭐⭐⭐ 4.9/5 rating
+              <strong>2,000,000+</strong> happy customers<br>⭐⭐⭐⭐⭐ Rated 4.9/5
             </div>
           </div>
         </div>
 
-        <!-- Right: Mockup -->
         <div class="hero-mockup animate-in-delay-1">
           <div class="mockup-window">
             <div class="mockup-topbar">
@@ -92,81 +229,56 @@
               <div class="mockup-dot" style="background:#28C840"></div>
             </div>
             <div class="mockup-body">
-              <!-- Mini Balance -->
               <div class="mini-balance-card">
                 <div class="mini-balance-label">💳 Total Balance</div>
                 <div class="mini-balance-amount">$48,920.50</div>
                 <div class="mini-balance-row">
-                  <div class="mini-balance-stat">
-                    ↑ Income<br><strong>$6,250</strong>
-                  </div>
-                  <div class="mini-balance-stat">
-                    ↓ Expense<br><strong>$2,840</strong>
-                  </div>
-                  <div class="mini-balance-stat">
-                    📈 Savings<br><strong>+12.4%</strong>
-                  </div>
+                  <div class="mini-balance-stat">↑ Income<br><strong>$6,250</strong></div>
+                  <div class="mini-balance-stat">↓ Expense<br><strong>$2,840</strong></div>
+                  <div class="mini-balance-stat">📈 Growth<br><strong>+12.4%</strong></div>
                 </div>
               </div>
-              <!-- Mini Stats -->
               <div class="mini-stats">
-                <div class="mini-stat-card">
-                  <div class="mini-stat-label">📥 Income</div>
-                  <div class="mini-stat-value green">+$6,250</div>
-                </div>
-                <div class="mini-stat-card">
-                  <div class="mini-stat-label">📤 Expenses</div>
-                  <div class="mini-stat-value red">-$2,840</div>
-                </div>
+                <div class="mini-stat-card"><div class="mini-stat-label">📥 Income</div><div class="mini-stat-value green">+$6,250</div></div>
+                <div class="mini-stat-card"><div class="mini-stat-label">📤 Expenses</div><div class="mini-stat-value red">-$2,840</div></div>
               </div>
-              <!-- Mini Transactions -->
-              <div style="font-size:11px; font-weight:600; color: var(--text-muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:.06em;">Recent</div>
+              <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Recent</div>
               <div class="mini-txn">
-                <div class="mini-txn-left">
-                  <div class="mini-txn-icon" style="background:#DCFCE7;">🛒</div>
-                  <div>
-                    <div class="mini-txn-name">Grocery Store</div>
-                    <div class="mini-txn-date">Today, 2:30 PM</div>
-                  </div>
-                </div>
+                <div class="mini-txn-left"><div class="mini-txn-icon" style="background:#DCFCE7">🛒</div><div><div class="mini-txn-name">Whole Foods</div><div class="mini-txn-date">Today, 2:30 PM</div></div></div>
                 <div class="mini-txn-amount" style="color:var(--red)">-$45.00</div>
               </div>
               <div class="mini-txn">
-                <div class="mini-txn-left">
-                  <div class="mini-txn-icon" style="background:#EBF3FE;">💼</div>
-                  <div>
-                    <div class="mini-txn-name">Salary Credit</div>
-                    <div class="mini-txn-date">Mar 25, 9:00 AM</div>
-                  </div>
-                </div>
+                <div class="mini-txn-left"><div class="mini-txn-icon" style="background:#EBF3FE">💼</div><div><div class="mini-txn-name">Salary Credit</div><div class="mini-txn-date">Mar 25</div></div></div>
                 <div class="mini-txn-amount" style="color:var(--green)">+$6,250.00</div>
               </div>
               <div class="mini-txn">
-                <div class="mini-txn-left">
-                  <div class="mini-txn-icon" style="background:#FEF3C7;">☕</div>
-                  <div>
-                    <div class="mini-txn-name">Starbucks</div>
-                    <div class="mini-txn-date">Yesterday</div>
-                  </div>
-                </div>
+                <div class="mini-txn-left"><div class="mini-txn-icon" style="background:#FEF3C7">☕</div><div><div class="mini-txn-name">Starbucks</div><div class="mini-txn-date">Yesterday</div></div></div>
                 <div class="mini-txn-amount" style="color:var(--red)">-$12.50</div>
               </div>
             </div>
           </div>
-
-          <!-- Floating badges -->
-          <div style="position:absolute; top: -16px; right: -20px; background: var(--bg-card); border-radius: 12px; padding: 10px 14px; box-shadow: var(--shadow-md); border: 1px solid var(--border); font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px; animation: fadeInUp 0.5s 0.4s ease both; opacity: 0;">
-            🔒 <span style="color: var(--green);">Bank-grade Secure</span>
-          </div>
-          <div style="position:absolute; bottom: 20px; left: -24px; background: var(--bg-card); border-radius: 12px; padding: 10px 14px; box-shadow: var(--shadow-md); border: 1px solid var(--border); font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px; animation: fadeInUp 0.5s 0.6s ease both; opacity: 0;">
-            📈 <span>+12.4% <span style="color: var(--green)">this month</span></span>
-          </div>
+          <div style="position:absolute;top:-16px;right:-20px;background:var(--bg-card);border-radius:12px;padding:10px 14px;box-shadow:var(--shadow-md);border:1px solid var(--border);font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;animation:fadeInUp .5s .4s ease both;opacity:0">🔒 <span style="color:var(--green)">Bank-grade Secure</span></div>
+          <div style="position:absolute;bottom:20px;left:-24px;background:var(--bg-card);border-radius:12px;padding:10px 14px;box-shadow:var(--shadow-md);border:1px solid var(--border);font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;animation:fadeInUp .5s .6s ease both;opacity:0">📈 <span>+12.4% <span style="color:var(--green)">this month</span></span></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- FEATURES -->
+  <!-- ===== LOGOS / TRUSTED BY ===== -->
+  <section style="padding:40px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg-card)">
+    <div class="container">
+      <p style="text-align:center;font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);font-weight:600;margin-bottom:28px">Trusted by teams at</p>
+      <div style="display:flex;justify-content:center;align-items:center;gap:40px;flex-wrap:wrap;opacity:.5">
+        <div style="font-family:'Poppins',sans-serif;font-weight:800;font-size:1.1rem">STRIPE</div>
+        <div style="font-family:'Poppins',sans-serif;font-weight:800;font-size:1.1rem">RAZORPAY</div>
+        <div style="font-family:'Poppins',sans-serif;font-weight:800;font-size:1.1rem">COINBASE</div>
+        <div style="font-family:'Poppins',sans-serif;font-weight:800;font-size:1.1rem">WISE</div>
+        <div style="font-family:'Poppins',sans-serif;font-weight:800;font-size:1.1rem">REVOLUT</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURES ===== -->
   <section class="features" id="features">
     <div class="container">
       <div class="section-header">
@@ -176,71 +288,276 @@
       </div>
       <div class="features-grid">
         <div class="feature-card">
-          <div class="feature-icon" style="background: var(--primary-light);">🔐</div>
+          <div class="feature-icon" style="background:var(--primary-light)">🔐</div>
           <h3 class="feature-title">Secure Payments</h3>
-          <p class="feature-desc">End-to-end encrypted transactions with 256-bit SSL and real-time fraud detection. Your money is always protected.</p>
-          <div style="margin-top: 20px; display: flex; gap: 8px;">
-            <span class="badge badge-blue">PCI DSS</span>
-            <span class="badge badge-green">256-bit SSL</span>
-          </div>
+          <p class="feature-desc">256-bit SSL encryption with real-time fraud detection. Every transaction is protected and monitored 24/7.</p>
+          <div style="margin-top:20px;display:flex;gap:8px"><span class="badge badge-blue">PCI DSS</span><span class="badge badge-green">256-bit SSL</span></div>
         </div>
         <div class="feature-card">
-          <div class="feature-icon" style="background: #DCFCE7;">📊</div>
+          <div class="feature-icon" style="background:#DCFCE7">📊</div>
           <h3 class="feature-title">Expense Tracking</h3>
-          <p class="feature-desc">Auto-categorize your spending, visualize trends with beautiful charts, and get AI-powered insights to save more.</p>
-          <div style="margin-top: 20px; display: flex; gap: 8px;">
-            <span class="badge badge-green">AI Powered</span>
-            <span class="badge" style="background:#FEF3C7; color: #92400E;">Smart Alerts</span>
-          </div>
+          <p class="feature-desc">Auto-categorize spending, visualize trends with beautiful charts, and get AI-powered insights to save more.</p>
+          <div style="margin-top:20px;display:flex;gap:8px"><span class="badge badge-green">AI Powered</span><span class="badge" style="background:#FEF3C7;color:#92400E">Smart Alerts</span></div>
         </div>
         <div class="feature-card">
-          <div class="feature-icon" style="background: #EDE9FE;">💳</div>
+          <div class="feature-icon" style="background:#EDE9FE">💳</div>
           <h3 class="feature-title">Card Management</h3>
-          <p class="feature-desc">Manage multiple virtual and physical cards, set spending limits, freeze/unfreeze instantly, all at your fingertips.</p>
-          <div style="margin-top: 20px; display: flex; gap: 8px;">
-            <span class="badge" style="background:#EDE9FE; color:#5B21B6;">Virtual Cards</span>
-            <span class="badge badge-blue">Instant Freeze</span>
-          </div>
+          <p class="feature-desc">Manage virtual and physical cards, set spending limits, and freeze/unfreeze instantly from the app.</p>
+          <div style="margin-top:20px;display:flex;gap:8px"><span class="badge" style="background:#EDE9FE;color:#5B21B6">Virtual Cards</span><span class="badge badge-blue">Instant Freeze</span></div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background:#FEF3C7">📈</div>
+          <h3 class="feature-title">Smart Investments</h3>
+          <p class="feature-desc">Grow your money with curated investment portfolios, fixed deposits, and auto-invest features.</p>
+          <div style="margin-top:20px;display:flex;gap:8px"><span class="badge" style="background:#FEF3C7;color:#92400E">Auto Invest</span><span class="badge badge-green">Low Risk</span></div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background:#FFE4E6">💸</div>
+          <h3 class="feature-title">Instant Transfers</h3>
+          <p class="feature-desc">Send money globally in seconds with zero hidden fees. Supports UPI, SWIFT, SEPA and more.</p>
+          <div style="margin-top:20px;display:flex;gap:8px"><span class="badge badge-blue">SWIFT</span><span class="badge" style="background:#FFE4E6;color:#9F1239">Zero Fees</span></div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background:#DCFCE7">🏦</div>
+          <h3 class="feature-title">Multi-Currency</h3>
+          <p class="feature-desc">Hold, exchange, and spend in 30+ currencies at real exchange rates. No markup, ever.</p>
+          <div style="margin-top:20px;display:flex;gap:8px"><span class="badge badge-green">30+ Currencies</span><span class="badge badge-blue">Live Rates</span></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- STATS -->
-  <section class="stats-section" id="stats">
+  <!-- ===== HOW IT WORKS ===== -->
+  <section class="how-section" id="how-it-works">
     <div class="container">
       <div class="section-header">
-        <div class="section-tag">✦ Our Numbers</div>
-        <h2 class="heading-lg section-title">Trusted at scale</h2>
+        <div class="section-tag">✦ How It Works</div>
+        <h2 class="heading-lg section-title">Up and running in 3 minutes</h2>
+        <p class="section-sub">No paperwork, no branch visits. Open your account completely online.</p>
       </div>
-      <div class="stats-grid">
-        <div class="stat-item">
-          <div class="stat-value gradient-text">$48B+</div>
-          <div class="stat-label">Total Transactions Processed</div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-title">Create Your Account</div>
+          <p class="step-desc">Sign up in under 2 minutes with just your email and phone number. No credit check required.</p>
         </div>
-        <div class="stat-item">
-          <div class="stat-value gradient-text">2M+</div>
-          <div class="stat-label">Active Users Worldwide</div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-title">Verify Your Identity</div>
+          <p class="step-desc">Quick KYC via a selfie and ID scan. Verified instantly using AI-powered document recognition.</p>
         </div>
-        <div class="stat-item">
-          <div class="stat-value gradient-text">99.9%</div>
-          <div class="stat-label">Uptime Guaranteed</div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-title">Start Banking!</div>
+          <p class="step-desc">Add money, get your virtual card, and start making payments globally within minutes.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- CTA -->
+  <!-- ===== STATS ===== -->
+  <section class="stats-section" id="stats" style="background:var(--bg-card);padding:80px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-item"><div class="stat-value gradient-text">$48B+</div><div class="stat-label">Total Transactions Processed</div></div>
+        <div class="stat-item"><div class="stat-value gradient-text">2M+</div><div class="stat-label">Active Users Worldwide</div></div>
+        <div class="stat-item"><div class="stat-value gradient-text">99.9%</div><div class="stat-label">Platform Uptime</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SECURITY ===== -->
+  <section class="security-section">
+    <div class="container">
+      <div class="security-grid">
+        <div>
+          <div class="section-tag">✦ Security First</div>
+          <h2 class="heading-lg" style="margin-top:14px;margin-bottom:16px">Your money is protected at every step</h2>
+          <p style="color:var(--text-muted);font-size:.95rem;line-height:1.75;margin-bottom:8px">We use bank-grade security infrastructure to ensure your funds and data are always safe. Every transaction is monitored in real time by our fraud detection engine.</p>
+          <div class="security-badges">
+            <div class="sec-badge"><div class="sec-badge-icon">🔐</div><div><div class="sec-badge-text">256-bit SSL</div><div class="sec-badge-sub">Encrypted data</div></div></div>
+            <div class="sec-badge"><div class="sec-badge-icon">🛡️</div><div><div class="sec-badge-text">PCI DSS</div><div class="sec-badge-sub">Level 1 Certified</div></div></div>
+            <div class="sec-badge"><div class="sec-badge-icon">🤖</div><div><div class="sec-badge-text">AI Fraud Guard</div><div class="sec-badge-sub">24/7 monitoring</div></div></div>
+            <div class="sec-badge"><div class="sec-badge-icon">🔑</div><div><div class="sec-badge-text">2FA / Biometric</div><div class="sec-badge-sub">Multi-factor auth</div></div></div>
+          </div>
+        </div>
+        <div style="background:var(--gradient);border-radius:var(--radius-xl);padding:44px;color:#fff;text-align:center;position:relative;overflow:hidden">
+          <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:rgba(255,255,255,.08);border-radius:50%"></div>
+          <div style="font-size:64px;margin-bottom:20px">🔒</div>
+          <div style="font-family:'Poppins',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:10px">Bank-Grade Security</div>
+          <p style="opacity:.8;font-size:14px;line-height:1.7">Your money is insured up to $250,000 by FDIC. Real-time fraud alerts keep you in control at all times.</p>
+          <div style="margin-top:24px;background:rgba(255,255,255,.15);border-radius:var(--radius-md);padding:16px;font-size:13px">
+            <strong>✓ FDIC Insured up to $250,000</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TESTIMONIALS ===== -->
+  <section class="testimonials">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">✦ Testimonials</div>
+        <h2 class="heading-lg section-title">Loved by millions</h2>
+        <p class="section-sub">Real stories from real customers around the world.</p>
+      </div>
+      <div class="testi-grid">
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-quote">"Switching to NeoBank was the best financial decision I made this year. The dashboard is beautiful and everything just works."</p>
+          <div class="testi-author">
+            <div class="avatar" style="width:40px;height:40px">JD</div>
+            <div><div class="testi-name">James Davidson</div><div class="testi-role">Freelance Designer, New York</div></div>
+          </div>
+        </div>
+        <div class="testi-card" style="border-color:var(--primary)">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-quote">"The expense tracking feature alone saved me $400 a month. I can finally see where my money is going and why."</p>
+          <div class="testi-author">
+            <div class="avatar" style="width:40px;height:40px;background:linear-gradient(135deg,#22C55E,#059669)">SR</div>
+            <div><div class="testi-name">Sana Raza</div><div class="testi-role">Product Manager, London</div></div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-stars">★★★★★</div>
+          <p class="testi-quote">"Managing 3 currencies used to be a nightmare. With NeoBank I do it all in one place with zero conversion fees."</p>
+          <div class="testi-author">
+            <div class="avatar" style="width:40px;height:40px;background:linear-gradient(135deg,#7C3AED,#A855F7)">KP</div>
+            <div><div class="testi-name">Karan Patel</div><div class="testi-role">Startup Founder, Mumbai</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PRICING ===== -->
+  <section class="pricing-section" id="pricing">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">✦ Pricing</div>
+        <h2 class="heading-lg section-title">Simple, transparent pricing</h2>
+        <p class="section-sub">No hidden fees. No surprises. Pick a plan that fits your life.</p>
+      </div>
+      <div class="pricing-grid">
+        <!-- Free -->
+        <div class="pricing-card">
+          <div class="plan-name">Starter</div>
+          <div class="plan-price">$0</div>
+          <div class="plan-period">/ month · Forever free</div>
+          <ul class="plan-features">
+            <li>1 Virtual Card</li>
+            <li>Up to $1,000/mo transfers</li>
+            <li>Basic expense tracking</li>
+            <li>5 free transactions/day</li>
+            <li>Email support</li>
+          </ul>
+          <button class="plan-btn plan-btn-outline" onclick="location.href='dashboard.html'">Get Started Free</button>
+        </div>
+        <!-- Popular -->
+        <div class="pricing-card popular">
+          <div class="popular-tag">⭐ Most Popular</div>
+          <div class="plan-name" style="color:rgba(255,255,255,.7)">Premium</div>
+          <div class="plan-price">$9</div>
+          <div class="plan-period" style="color:rgba(255,255,255,.7)">/ month · billed annually</div>
+          <ul class="plan-features">
+            <li>3 Physical + Virtual Cards</li>
+            <li>Unlimited transfers</li>
+            <li>AI expense insights</li>
+            <li>Multi-currency (30+)</li>
+            <li>Priority 24/7 support</li>
+            <li>Cashback rewards</li>
+          </ul>
+          <button class="plan-btn plan-btn-white" onclick="location.href='dashboard.html'">Start Premium →</button>
+        </div>
+        <!-- Business -->
+        <div class="pricing-card">
+          <div class="plan-name">Business</div>
+          <div class="plan-price">$29</div>
+          <div class="plan-period">/ month · per team</div>
+          <ul class="plan-features">
+            <li>Unlimited Cards</li>
+            <li>Team spending controls</li>
+            <li>Bulk payroll payments</li>
+            <li>Dedicated account manager</li>
+            <li>Custom spend limits</li>
+            <li>API access</li>
+          </ul>
+          <button class="plan-btn plan-btn-outline" onclick="location.href='dashboard.html'">Contact Sales</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section class="faq-section" id="faq">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-tag">✦ FAQ</div>
+        <h2 class="heading-lg section-title">Frequently asked questions</h2>
+      </div>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <div class="faq-question">Is NeoBank safe and regulated? <span class="faq-arrow">▾</span></div>
+          <div class="faq-answer">Yes. NeoBank is FDIC insured up to $250,000, PCI DSS Level 1 certified, and regulated by financial authorities in all operating countries.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">How long does account opening take? <span class="faq-arrow">▾</span></div>
+          <div class="faq-answer">Most accounts are verified and opened within 2–3 minutes through our AI-powered KYC process. No branch visit required.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">Are there any hidden fees? <span class="faq-arrow">▾</span></div>
+          <div class="faq-answer">Never. Our pricing is 100% transparent. What you see is what you pay. International transfers use the real exchange rate with no markup.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">Can I use NeoBank outside my country? <span class="faq-arrow">▾</span></div>
+          <div class="faq-answer">Absolutely! NeoBank works in 40+ countries. You can hold and spend in 30+ currencies with your physical or virtual card anywhere in the world.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">How does expense tracking work? <span class="faq-arrow">▾</span></div>
+          <div class="faq-answer">Every transaction is automatically categorized using AI. You get a real-time breakdown of spending by category, merchant, and time period.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">How do I cancel my subscription? <span class="faq-arrow">▾</span></div>
+          <div class="faq-answer">You can cancel anytime from your account settings with one click. No cancellation fees, no questions asked. Your free account remains active.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== APP DOWNLOAD ===== -->
+  <section class="app-section">
+    <div class="container">
+      <div class="app-inner">
+        <div>
+          <div class="section-tag" style="color:rgba(255,255,255,.7);background:rgba(255,255,255,.1)">✦ Mobile App</div>
+          <h2 style="font-family:'Poppins',sans-serif;font-size:2rem;font-weight:800;margin-top:14px;margin-bottom:14px">Bank from your pocket</h2>
+          <p style="opacity:.8;font-size:.95rem;line-height:1.75;max-width:420px">Our iOS and Android apps bring the full NeoBank experience to your fingertips. Pay, transfer, and track — on the go.</p>
+          <div class="app-store-btns">
+            <div class="app-store-btn">
+              <div class="app-store-btn-icon">🍎</div>
+              <div><div class="app-store-btn-text">Download on the</div><span class="app-store-btn-name">App Store</span></div>
+            </div>
+            <div class="app-store-btn">
+              <div class="app-store-btn-icon">▶️</div>
+              <div><div class="app-store-btn-text">Get it on</div><span class="app-store-btn-name">Google Play</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="app-phone-mock">📱<br><span style="font-size:18px;opacity:.7">NeoBank Mobile</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
   <section class="cta-section" id="cta">
     <div class="container">
       <div class="cta-box">
-        <div class="cta-title" style="position:relative;z-index:1;">Ready to rethink banking?</div>
-        <p class="cta-sub" style="position:relative;z-index:1;">Join 2 million+ users already managing their finances smarter.</p>
-        <div style="display:flex; gap:16px; justify-content:center; position:relative;z-index:1; flex-wrap:wrap;">
+        <div class="cta-title" style="position:relative;z-index:1">Ready to rethink banking?</div>
+        <p class="cta-sub" style="position:relative;z-index:1">Join 2 million+ users already managing their finances smarter. No credit card required.</p>
+        <div style="display:flex;gap:16px;justify-content:center;position:relative;z-index:1;flex-wrap:wrap">
           <a href="dashboard.html" class="btn-white">Open Free Account →</a>
-          <a href="dashboard.html" class="btn" style="background:rgba(255,255,255,0.15); color:#fff; border:1.5px solid rgba(255,255,255,0.3);">
-            View Dashboard
-          </a>
+          <a href="dashboard.html" class="btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)">View Dashboard</a>
         </div>
       </div>
     </div>
@@ -248,19 +565,73 @@
 
 </main>
 
-<!-- FOOTER -->
-<footer class="landing-footer">
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
   <div class="container">
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <div class="logo-icon" style="width:28px;height:28px;font-size:13px;">💳</div>
-        <span style="color:rgba(255,255,255,0.8); font-weight:600;">NeoBank</span>
+    <div class="footer-grid">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="logo-icon">💳</div>
+          <span style="color:#fff;font-family:'Poppins',sans-serif;font-weight:700;font-size:1.1rem">NeoBank</span>
+        </div>
+        <p class="footer-brand-desc">Modern digital banking for the next generation. Secure, simple, and global.</p>
+        <div class="footer-socials" style="margin-top:20px">
+          <div class="social-btn">𝕏</div>
+          <div class="social-btn">in</div>
+          <div class="social-btn">f</div>
+          <div class="social-btn">▶</div>
+        </div>
       </div>
-      <div>© 2025 NeoBank Inc. · <a href="#">Privacy</a> · <a href="#">Terms</a> · <a href="#">Security</a></div>
+      <div>
+        <div class="footer-col-title">Product</div>
+        <div class="footer-links">
+          <a href="#features"     class="footer-link">Features</a>
+          <a href="#pricing"      class="footer-link">Pricing</a>
+          <a href="dashboard.html" class="footer-link">Dashboard</a>
+          <a href="transactions.html" class="footer-link">Transactions</a>
+          <a href="cards.html"    class="footer-link">Cards</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Company</div>
+        <div class="footer-links">
+          <a href="#" class="footer-link">About</a>
+          <a href="#" class="footer-link">Blog</a>
+          <a href="#" class="footer-link">Careers</a>
+          <a href="#" class="footer-link">Press</a>
+          <a href="#" class="footer-link">Contact</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Legal</div>
+        <div class="footer-links">
+          <a href="#" class="footer-link">Privacy Policy</a>
+          <a href="#" class="footer-link">Terms of Service</a>
+          <a href="#" class="footer-link">Cookie Policy</a>
+          <a href="#" class="footer-link">Security</a>
+          <a href="#" class="footer-link">Compliance</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2025 NeoBank Inc. All rights reserved. FDIC Insured · PCI DSS Certified</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="live-dot"></span> All systems operational
+      </div>
     </div>
   </div>
 </footer>
 
+<script>
+  // FAQ accordion
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.querySelector('.faq-question').addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+</script>
 <script src="app.js"></script>
 </body>
 </html>
