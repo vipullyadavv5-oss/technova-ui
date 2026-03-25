@@ -1,168 +1,162 @@
+
 /* ============================================
-   NeoBank – Shared App JavaScript
+   NEOBANK PRO INTERACTIVE JS
    ============================================ */
 
-// ---- Dark Mode Toggle ----
-const THEME_KEY = 'neobank-theme';
-
-function applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
-  // Update all toggle buttons on the page
-  document.querySelectorAll('#themeToggle, .theme-toggle').forEach(btn => {
-    btn.textContent = theme === 'dark' ? '☀️' : '🌙';
-    btn.title = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
-  });
-  localStorage.setItem(THEME_KEY, theme);
-}
-
-function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme') || 'light';
-  applyTheme(current === 'dark' ? 'light' : 'dark');
-}
-
-// Apply saved theme on load
-(function initTheme() {
-  const saved = localStorage.getItem(THEME_KEY) || 'light';
-  applyTheme(saved);
-})();
-
-// Attach theme toggles once DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('#themeToggle, .theme-toggle').forEach(btn => {
-    btn.addEventListener('click', toggleTheme);
-  });
-
-  // ---- Chart tab interactivity ----
-  const tabs = document.querySelectorAll('.chart-tab');
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-    });
-  });
-
-  // ---- Animate balance counter ----
-  const balanceEl = document.querySelector('.balance-amount');
-  if (balanceEl) {
-    animateCounter(balanceEl, 0, 48920.5, 1400, '₹', '.50');
-  }
-
-  // ---- Quick action ripple effect ----
-  document.querySelectorAll('.quick-action').forEach(el => {
-    el.addEventListener('click', function (e) {
-      this.style.transform = 'scale(0.95)';
-      setTimeout(() => (this.style.transform = ''), 150);
-    });
-  });
-
-  // ---- Nav item active state in sidebar ----
-  const currentPath = window.location.pathname.split('/').pop();
-  document.querySelectorAll('.nav-item').forEach(item => {
-    const href = item.getAttribute('href');
-    if (href && href === currentPath) {
-      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-      item.classList.add('active');
-    }
-  });
-
-  // ---- Smooth scroll for landing page anchor links ----
-  document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-      const target = document.querySelector(a.getAttribute('href'));
-      if (target) {
-        e.preventDefault();
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    });
-  });
-
-  // ---- Navbar scroll shadow (landing) ----
-  const navbar = document.getElementById('navbar');
-  if (navbar) {
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 20) {
-        navbar.style.boxShadow = '0 4px 24px rgba(0,0,0,0.1)';
-      } else {
-        navbar.style.boxShadow = 'none';
-      }
-    }, { passive: true });
-  }
-
-  // ---- Spending bar animation ----
-  const fills = document.querySelectorAll('.spending-fill, .progress-fill, .limit-fill');
-  if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const el = entry.target;
-          const targetW = el.style.width;
-          el.style.width = '0';
-          requestAnimationFrame(() => {
-            setTimeout(() => { el.style.transition = 'width 0.9s cubic-bezier(0.4, 0, 0.2, 1)'; el.style.width = targetW; }, 100);
-          });
-          observer.unobserve(el);
-        }
-      });
-    }, { threshold: 0.2 });
-    fills.forEach(f => observer.observe(f));
-  }
-
-  // ---- Tooltip for card row ----
-  document.querySelectorAll('.credit-card').forEach(card => {
-    card.addEventListener('mouseenter', () => { card.style.zIndex = '10'; });
-    card.addEventListener('mouseleave', () => { card.style.zIndex = ''; });
-  });
-
-  // ---- Animate chart path on load ----
-  const chartPaths = document.querySelectorAll('.chart-svg path');
-  chartPaths.forEach(path => {
-    const length = path.getTotalLength ? path.getTotalLength() : 500;
-    if (path.getTotalLength) {
-      path.style.strokeDasharray = length;
-      path.style.strokeDashoffset = length;
-      path.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1)';
-      requestAnimationFrame(() => {
-        setTimeout(() => { path.style.strokeDashoffset = 0; }, 200);
-      });
-    }
-  });
-
-  // ---- Form input card number formatting ----
-  const cardNumberInput = document.querySelector('input[placeholder="1234 5678 9012 3456"]');
-  if (cardNumberInput) {
-    cardNumberInput.addEventListener('input', function () {
-      let val = this.value.replace(/\D/g, '').substring(0, 16);
-      this.value = val.replace(/(.{4})/g, '₹1 ').trim();
-    });
-  }
-
-  const expiryInput = document.querySelector('input[placeholder="MM / YY"]');
-  if (expiryInput) {
-    expiryInput.addEventListener('input', function () {
-      let val = this.value.replace(/\D/g, '').substring(0, 4);
-      if (val.length >= 3) val = val.substring(0, 2) + ' / ' + val.substring(2);
-      this.value = val;
-    });
+  initTheme();
+  initIntersectionObservers();
+  initBalanceToggle();
+  initTiltCards();
+  
+  if (document.getElementById('expenseChartCanvas')) {
+    initChartJS();
   }
 });
 
-// ---- Counter animation utility ----
-function animateCounter(el, from, to, duration, prefix = '', suffix = '') {
-  const originalHTML = el.innerHTML;
-  const start = performance.now();
-  function update(now) {
-    const elapsed = now - start;
-    const progress = Math.min(elapsed / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
-    const value = from + (to - from) * eased;
-    const formatted = value.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-    if (suffix) {
-      el.innerHTML = `₹{prefix}₹{formatted}<span style="font-size:1.6rem; opacity:0.85;">₹{suffix}</span>`;
-    } else {
-      el.textContent = `₹{prefix}₹{formatted}`;
-    }
-    if (progress < 1) requestAnimationFrame(update);
-    else el.innerHTML = originalHTML;
-  }
-  requestAnimationFrame(update);
+// 1. Theme persistence
+function initTheme() {
+  const toggleBtn = document.getElementById('themeToggle');
+  if(!toggleBtn) return;
+  const currentTheme = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  toggleBtn.innerHTML = currentTheme === 'dark' ? '☀️' : '🌙';
+
+  toggleBtn.addEventListener('click', () => {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const newTheme = isDark ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    toggleBtn.innerHTML = newTheme === 'dark' ? '☀️' : '🌙';
+  });
 }
+
+// 2. Intersection Observer (Scroll Fade-ins)
+function initIntersectionObservers() {
+  const elements = document.querySelectorAll('.fade-in-up');
+  if(elements.length === 0) return;
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, index) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, (index % 3) * 100);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+  elements.forEach(el => observer.observe(el));
+}
+
+// 3. Balance Show/Hide Toggle
+function initBalanceToggle() {
+  const toggleBtn = document.getElementById('toggle-balance');
+  const balanceEl = document.getElementById('live-balance');
+  if(toggleBtn && balanceEl) {
+    toggleBtn.addEventListener('click', () => {
+      balanceEl.classList.toggle('balance-hidden');
+    });
+  }
+}
+
+// 4. Vanilla 3D Tilt Effect for Cards
+function initTiltCards() {
+  const tiltCards = document.querySelectorAll('.tilt-card');
+  tiltCards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      
+      const rotateX = ((y - centerY) / centerY) * -12;
+      const rotateY = ((x - centerX) / centerX) * 12;
+      
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+    });
+    
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
+    });
+  });
+}
+
+// 5. WOW Feature: Chart.js Animated Graph
+function initChartJS() {
+  const ctx = document.getElementById('expenseChartCanvas').getContext('2d');
+  
+  // Creates a beautiful gradient fill under the line graph
+  const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+  gradient.addColorStop(0, 'rgba(47, 128, 237, 0.5)'); 
+  gradient.addColorStop(1, 'rgba(86, 204, 242, 0)'); 
+  
+  setTimeout(() => {
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+          label: 'Expenses',
+          data: [120, 190, 80, 250, 160, 310, 210],
+          borderColor: '#2F80ED',
+          backgroundColor: gradient,
+          borderWidth: 3,
+          pointBackgroundColor: '#FFFFFF',
+          pointBorderColor: '#2F80ED',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: {
+          duration: 2500,
+          easing: 'easeOutQuart'
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#0F172A',
+            padding: 12,
+            titleFont: { family: 'Inter', size: 13 },
+            bodyFont: { family: 'Inter', size: 14, weight: 'bold' },
+            displayColors: false,
+            callbacks: { label: (ctx) => '₹' + ctx.raw }
+          }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#6B7280', font: { family: 'Inter', size: 11 } } },
+          y: { 
+            grid: { color: '#E5E7EB', borderDash: [5, 5] }, 
+            ticks: { color: '#6B7280', font: { family: 'Inter', size: 11 }, callback: (val) => '₹'+val },
+            border: { display: false },
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  }, 200); // 200ms delay to let UI render before heavy chart calculation
+}
+
+// Handle SVG Drawing logic for previous pages if Chart.js isn't used
+function drawChart() {
+  const path = document.querySelector('.chart-svg path');
+  if(path) {
+    const length = path.getTotalLength();
+    path.style.strokeDasharray = length;
+    path.style.strokeDashoffset = length;
+    path.getBoundingClientRect(); // trigger reflow
+    path.style.transition = path.style.WebkitTransition = 'stroke-dashoffset 2s ease-in-out';
+    path.style.strokeDashoffset = '0';
+  }
+}
+// Call old drawChart if path exists
+if(document.querySelector('.chart-svg path')) setTimeout(drawChart, 100);

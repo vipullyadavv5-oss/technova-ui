@@ -145,7 +145,7 @@ fs.writeFileSync('index.html', indexHtml);
 
 let cardsHtml = fs.readFileSync('cards.html', 'utf-8');
 cardsHtml = cardsHtml.replace(/class="credit-card"/g, 'class="credit-card tilt-card"');
-cardsHtml = cardsHtml.replace(/class="card-balance">([^<]+)<\\/div>/g, 'class="card-balance"><span class="blur-target">$1</span> <span class="eye-toggle" onclick="this.previousElementSibling.classList.toggle(\\'balance-hidden\\')">👁️</span></div>');
+cardsHtml = cardsHtml.replace(/class="card-balance">([^<]+)<\/div>/g, `class="card-balance"><span class="blur-target">$1</span> <span class="eye-toggle" onclick="this.previousElementSibling.classList.toggle('balance-hidden')">👁️</span></div>`);
 fs.writeFileSync('cards.html', cardsHtml);
 
 
