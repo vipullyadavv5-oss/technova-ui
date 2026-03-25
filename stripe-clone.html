@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stripe UI Clone – Financial infrastructure for the internet</title>
+  <style>
+    /* ========================================================
+       STRIPE-INSPIRED DESIGN SYSTEM
+       Fonts, Colors, and Global Styles
+       ======================================================== */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      /* Colors */
+      --blurple: #635bff;
+      --blurple-dark: #0a2540;
+      --slate: #425466;
+      --slate-light: #adbdcc;
+      --white: #ffffff;
+      --bg-gray: #f6f9fc;
+      
+      /* Gradients */
+      --gradient-text: linear-gradient(135deg, #00d4ff 0%, #635bff 50%, #ff6b6b 100%);
+      --gradient-btn: linear-gradient(135deg, #635bff 0%, #00d4ff 100%);
+      
+      /* Shadows */
+      --shadow-sm: 0 2px 5px rgba(50,50,93,0.1), 0 1px 1.5px rgba(0,0,0,0.07);
+      --shadow-md: 0 4px 6px rgba(50,50,93,0.11), 0 1px 3px rgba(0,0,0,0.08);
+      --shadow-lg: 0 15px 35px rgba(50,50,93,0.1), 0 5px 15px rgba(0,0,0,0.07);
+      --shadow-hover: 0 18px 35px rgba(50,50,93,0.1), 0 8px 15px rgba(0,0,0,0.07);
+      
+      /* Layout */
+      --container-w: 1080px;
+      --radius: 8px;
+      --transition: all 0.2s ease-in-out;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--slate);
+      line-height: 1.6;
+      background-color: var(--white);
+      overflow-x: hidden;
+    }
+
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+    button { font-family: inherit; border: none; background: none; cursor: pointer; }
+
+    .container {
+      max-width: var(--container-w);
+      margin: 0 auto;
+      padding: 0 20px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* ========================================================
+       DIAGONAL BACKGROUND STRIPES & BLURS
+       ======================================================== */
+    .bg-stripes {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 900px;
+      overflow: hidden;
+      z-index: 1;
+      background: var(--bg-gray);
+      /* Base skew */
+      clip-path: polygon(0 0, 100% 0, 100% 70%, 0 100%);
+    }
+
+    .stripe-canvas {
+      position: absolute;
+      top: -150px;
+      left: 0;
+      width: 100%;
+      height: 120%;
+      transform: skewY(-12deg);
+      background: var(--white);
+      z-index: 0;
+    }
+
+    /* Vibrant colored bands */
+    .stripe-band {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      background: linear-gradient(90deg, #635bff, #00d4ff, #ff6b6b);
+      opacity: 0.1;
+      filter: blur(80px);
+    }
+    .sb-1 { top: 30%; height: 200px; opacity: 0.15; transform: scale(1.5); }
+    .sb-2 { top: 60%; height: 300px; opacity: 0.1; right: -20%; background: linear-gradient(90deg, #ff6b6b, #ffbe0b); }
+
+    /* The distinct sharp colored line */
+    .stripe-line {
+      position: absolute;
+      left: 0;
+      width: 150%;
+      height: 120px;
+      top: 55%;
+      background: linear-gradient(90deg, transparent 20%, #635bff 40%, rgba(0, 212, 255, 0.8) 60%, transparent 80%);
+      opacity: 0.8;
+      transform: skewY(0deg) scaleY(1.5);
+      filter: blur(10px);
+    }
+
+    /* ========================================================
+       NAVBAR
+       ======================================================== */
+    header {
+      position: relative;
+      z-index: 50;
+      padding: 24px 0;
+    }
+
+    .nav-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: var(--blurple-dark);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+    }
+    
+    .nav-links a {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--blurple-dark);
+      transition: var(--transition);
+      opacity: 0.85;
+    }
+    .nav-links a:hover { opacity: 1; color: var(--blurple); }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-arrow {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--blurple-dark);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: var(--transition);
+    }
+    .btn-arrow::after {
+      content: '→';
+      transition: transform 0.2s ease;
+    }
+    .btn-arrow:hover { color: var(--blurple); opacity: 1; }
+    .btn-arrow:hover::after { transform: translateX(4px); }
+
+    .btn-primary {
+      background: var(--blurple-dark);
+      color: var(--white);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-primary:hover {
+      background: var(--slate);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+      color: var(--white);
+    }
+    .btn-primary::after { content: '→'; transition: transform 0.2s ease; font-weight: normal; }
+    .btn-primary:hover::after { transform: translateX(3px); }
+
+    /* ========================================================
+       HERO SECTION
+       ======================================================== */
+    .hero {
+      position: relative;
+      padding: 80px 0 160px;
+      z-index: 10;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .hero-content {
+      max-width: 520px;
+    }
+
+    .hero-title {
+      font-size: clamp(3rem, 5vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      color: var(--blurple-dark);
+      margin-bottom: 24px;
+    }
+
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--slate);
+      line-height: 1.6;
+      margin-bottom: 40px;
+      font-weight: 500;
+    }
+
+    .hero-buttons {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .btn-hero {
+      background: var(--blurple-dark);
+      color: var(--white);
+      padding: 12px 24px;
+      border-radius: 40px;
+      font-size: 16px;
+      font-weight: 600;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-hero:hover {
+      background: var(--slate);
+      transform: translateY(-1px);
+    }
+    .btn-hero::after { content: '→'; transition: transform 0.2s; }
+    .btn-hero:hover::after { transform: translateX(4px); }
+
+    .btn-hero-outline {
+      color: var(--blurple-dark);
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition);
+    }
+    .btn-hero-outline::after { content: '→'; transition: transform 0.2s; }
+    .btn-hero-outline:hover { color: var(--blurple); }
+    .btn-hero-outline:hover::after { transform: translateX(4px); }
+
+
+    /* ========================================================
+       HERO MOCKUPS / ILLUSTRATIONS
+       ======================================================== */
+    .hero-visual {
+      position: relative;
+      width: 100%;
+      height: 600px;
+      perspective: 1200px; /* 3D effect container */
+    }
+
+    /* Generic phone or panel styling */
+    .mockup-panel {
+      position: absolute;
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: transform 0.4s ease;
+    }
+
+    /* Main Checkout Panel */
+    .panel-checkout {
+      width: 320px;
+      height: 480px;
+      top: 40px;
+      left: 100px;
+      transform: rotateY(-15deg) rotateX(10deg) translateZ(50px);
+      z-index: 3;
+    }
+    
+    .panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .panel-logo { width: 32px; height: 32px; background: var(--bg-gray); border-radius: 50%; }
+    .panel-title { font-size: 14px; font-weight: 600; color: var(--blurple-dark); }
+    .panel-price { font-size: 24px; font-weight: 700; color: var(--blurple-dark); margin: 20px; }
+    
+    .panel-form { margin: 0 20px; }
+    .fake-input { 
+      height: 44px; 
+      border: 1px solid #e0e6eb; 
+      border-radius: 6px; 
+      margin-bottom: 12px; 
+      background: #fbfdff;
+      display: flex; align-items: center; padding: 0 12px;
+      color: var(--slate-light); font-size: 13px;
+    }
+    .fake-button {
+      height: 44px;
+      background: var(--blurple);
+      border-radius: 6px;
+      margin-top: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 600; font-size: 14px;
+    }
+
+    /* Back Panel (Dashboard/Graphs) */
+    .panel-dashboard {
+      width: 380px;
+      height: 380px;
+      top: 0;
+      left: -20px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      transform: rotateY(-10deg) rotateX(5deg) translateZ(-50px);
+      z-index: 2;
+    }
+    .db-header { height: 40px; background: var(--bg-gray); border-bottom: 1px solid #e0e6eb; }
+    .db-chart {
+      margin: 20px;
+      height: 150px;
+      border-bottom: 1px dashed #e0e6eb;
+      position: relative;
+    }
+    .db-line {
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
+      background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 50" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,50 L0,30 C20,20 30,40 50,20 C70,0 80,30 100,10 L100,50 Z" fill="%23635bff" opacity="0.1"/></svg>') no-repeat;
+      background-size: 100% 100%;
+    }
+    .db-line-path {
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
+      background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 50" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,30 C20,20 30,40 50,20 C70,0 80,30 100,10" fill="none" stroke="%23635bff" stroke-width="2"/></svg>') no-repeat;
+      background-size: 100% 100%;
+    }
+
+    /* Floating code snippet */
+    .panel-code {
+      width: 280px;
+      height: 180px;
+      background: var(--blurple-dark);
+      color: #7b94ad;
+      top: 300px;
+      left: -60px;
+      transform: rotateY(-20deg) rotateX(15deg) translateZ(100px);
+      z-index: 4;
+      font-family: monospace;
+      font-size: 12px;
+      padding: 20px;
+      line-height: 1.8;
+    }
+    .code-keyword { color: #00d4ff; }
+    .code-string { color: #3ecf8e; }
+
+
+    /* ========================================================
+       LOGO CLOUD SECTION
+       ======================================================== */
+    .logos-section {
+      padding: 40px 0;
+      position: relative;
+      z-index: 10;
+    }
+    .logos-grid {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      opacity: 0.6;
+      filter: grayscale(100%);
+    }
+    .logos-grid span {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    /* ========================================================
+       FEATURE SECTION (Unified Platform)
+       ======================================================== */
+    .unified-platform {
+      padding: 120px 0;
+      background: var(--white);
+      position: relative;
+      z-index: 10;
+    }
+    
+    .section-eyebrow {
+      color: var(--blurple);
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 16px;
+      letter-spacing: 0.5px;
+    }
+    
+    .section-title {
+      font-size: 2.25rem;
+      color: var(--blurple-dark);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+      max-width: 500px;
+      line-height: 1.2;
+    }
+
+    .section-desc {
+      font-size: 1.15rem;
+      color: var(--slate);
+      max-width: 600px;
+      margin-bottom: 60px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 30px;
+    }
+
+    .feature-card {
+      position: relative;
+    }
+    
+    .f-icon {
+      width: 48px; height: 48px;
+      background: var(--bg-gray);
+      border-radius: 50%;
+      margin-bottom: 20px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .f-icon-dot { width: 14px; height: 14px; background: var(--blurple); border-radius: 3px; }
+    
+    .feature-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--blurple-dark);
+      margin-bottom: 12px;
+    }
+    
+    .feature-card p {
+      font-size: 15px;
+      color: var(--slate);
+      line-height: 1.5;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Diagonal Background Container -->
+  <div class="bg-stripes">
+    <div class="stripe-canvas">
+      <div class="stripe-band sb-1"></div>
+      <div class="stripe-band sb-2"></div>
+      <div class="stripe-line"></div>
+    </div>
+  </div>
+
+  <header>
+    <div class="container nav-inner">
+      <a href="#" class="logo">stripe</a>
+      <nav class="nav-links">
+        <a href="#">Products</a>
+        <a href="#">Solutions</a>
+        <a href="#">Developers</a>
+        <a href="#">Resources</a>
+        <a href="#">Pricing</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="#" class="btn-arrow">Contact sales</a>
+        <a href="#" class="btn-primary">Sign in</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <h1 class="hero-title">Financial infrastructure for the internet</h1>
+          <p class="hero-sub">Millions of companies of all sizes—from startups to Fortune 500s—use Stripe's software and APIs to accept payments, send payouts, and manage their businesses online.</p>
+          <div class="hero-buttons">
+            <a href="#" class="btn-hero">Start now</a>
+            <a href="#" class="btn-hero-outline">Contact sales</a>
+          </div>
+        </div>
+
+        <div class="hero-visual">
+          
+          <!-- Code Panel (Back/Left) -->
+          <div class="mockup-panel panel-code">
+            <div><span class="code-keyword">const</span> stripe = require(<span class="code-string">'stripe'</span>);</div>
+            <br>
+            <div><span class="code-keyword">await</span> stripe.paymentIntents.create({</div>
+            <div style="padding-left: 20px; color: #fff;">amount: <span class="code-keyword">2000</span>,</div>
+            <div style="padding-left: 20px; color: #fff;">currency: <span class="code-string">'usd'</span>,</div>
+            <div style="padding-left: 20px; color: #fff;">automatic_payment_methods: {</div>
+            <div style="padding-left: 40px; color: #fff;">enabled: <span class="code-keyword">true</span>,</div>
+            <div style="padding-left: 20px;">},</div>
+            <div>});</div>
+          </div>
+
+          <!-- Dashboard Panel (Middle) -->
+          <div class="mockup-panel panel-dashboard">
+            <div class="db-header">
+              <div style="display:flex; gap:6px; padding: 14px;">
+                <div style="width:10px;height:10px;border-radius:50%;background:#e0e6eb"></div>
+                <div style="width:10px;height:10px;border-radius:50%;background:#e0e6eb"></div>
+                <div style="width:10px;height:10px;border-radius:50%;background:#e0e6eb"></div>
+              </div>
+            </div>
+            <div style="padding: 20px 20px 0;">
+              <div style="font-size:12px;color:var(--slate);font-weight:600;text-transform:uppercase">Today</div>
+              <div style="font-size:28px;font-weight:700;color:var(--blurple-dark)">$14,320.00</div>
+            </div>
+            <div class="db-chart">
+              <div class="db-line"></div>
+              <div class="db-line-path"></div>
+            </div>
+          </div>
+
+          <!-- Checkout Panel (Front) -->
+          <div class="mockup-panel panel-checkout">
+            <div class="panel-header">
+              <div class="panel-logo"></div>
+              <div class="panel-title">Acme Corp</div>
+            </div>
+            <div class="panel-price">$200.00</div>
+            
+            <div class="panel-form">
+              <div class="fake-input">Email address</div>
+              <div class="fake-input">Card information</div>
+              <div style="display:flex; gap:12px;">
+                <div class="fake-input" style="flex:1;">MM/YY</div>
+                <div class="fake-input" style="flex:1;">CVC</div>
+              </div>
+              <div class="fake-input">Name on card</div>
+              <div class="fake-input">Country or region</div>
+              <div class="fake-button">Pay $200.00</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="logos-section">
+      <div class="container logos-grid">
+        <span>Instacart</span>
+        <span>Salesforce</span>
+        <span>Amazon</span>
+        <span>Slack</span>
+        <span>Shopify</span>
+        <span>Google</span>
+        <span>Lyft</span>
+        <span>Zoom</span>
+      </div>
+    </section>
+
+    <section class="unified-platform">
+      <div class="container">
+        <div class="section-eyebrow">Unified platform</div>
+        <h2 class="section-title">A fully integrated suite of financial and payments products</h2>
+        <p class="section-desc">Reduce costs, grow revenue, and run your business more efficiently on a fully integrated platform. Use Stripe to handle all of your payments-related needs, manage revenue operations, and launch (or invent) new business models.</p>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="f-icon"><div class="f-icon-dot"></div></div>
+            <h3>Global payments</h3>
+            <p>Accept payments online, in person, or through your platform globally with automated optimization.</p>
+          </div>
+          <div class="feature-card">
+            <div class="f-icon"><div class="f-icon-dot" style="background: #00d4ff"></div></div>
+            <h3>Revenue and finance</h3>
+            <p>Automate billing and subscriptions, manage invoicing, reduce fraud, and streamline accounting.</p>
+          </div>
+          <div class="feature-card">
+            <div class="f-icon"><div class="f-icon-dot" style="background: #ff6b6b"></div></div>
+            <h3>Banking-as-a-Service</h3>
+            <p>Build your own financial services. Issue cards, create bank accounts, and offer treasury services.</p>
+          </div>
+          <div class="feature-card">
+            <div class="f-icon"><div class="f-icon-dot" style="background: #ffbe0b"></div></div>
+            <h3>No-code options</h3>
+            <p>Create payment links, send invoices, and set up checkout flows without writing a single line of code.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer style="background: var(--bg-gray); padding: 80px 0; border-top: 1px solid #e0e6eb;">
+    <div class="container" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 40px;">
+      <div>
+        <div class="logo">stripe</div>
+        <p style="margin-top: 20px; font-size: 13px;">United States<br>English</p>
+      </div>
+      <div>
+        <strong style="font-size: 14px; color: var(--blurple-dark);">Products</strong>
+        <ul style="margin-top: 16px; font-size: 14px; display: flex; flex-direction: column; gap: 8px;">
+          <li><a href="#">Payments</a></li>
+          <li><a href="#">Billing</a></li>
+          <li><a href="#">Invoicing</a></li>
+          <li><a href="#">Terminal</a></li>
+        </ul>
+      </div>
+      <div>
+        <strong style="font-size: 14px; color: var(--blurple-dark);">Resources</strong>
+        <ul style="margin-top: 16px; font-size: 14px; display: flex; flex-direction: column; gap: 8px;">
+          <li><a href="#">Support Center</a></li>
+          <li><a href="#">Guides</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Annual Conference</a></li>
+        </ul>
+      </div>
+      <div>
+        <strong style="font-size: 14px; color: var(--blurple-dark);">Company</strong>
+        <ul style="margin-top: 16px; font-size: 14px; display: flex; flex-direction: column; gap: 8px;">
+          <li><a href="#">About Stripe</a></li>
+          <li><a href="#">Customers</a></li>
+          <li><a href="#">Newsroom</a></li>
+          <li><a href="#">Jobs</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
