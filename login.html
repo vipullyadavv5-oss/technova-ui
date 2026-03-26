@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TechNova – Secure Sign In</title>
+<meta name="description" content="Bank-grade security with multi-layer authentication. Sign in to TechNova."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0f1e;
+  --bg2:#0f172a;
+  --card:rgba(255,255,255,0.04);
+  --card-border:rgba(255,255,255,0.10);
+  --text:#f1f5f9;
+  --muted:#94a3b8;
+  --primary:#3b82f6;
+  --primary-glow:rgba(59,130,246,0.35);
+  --accent:#8b5cf6;
+  --green:#22c55e;
+  --red:#ef4444;
+  --radius:16px;
+  --radius-sm:10px;
+  --transition:0.2s cubic-bezier(0.4,0,0.2,1);
+}
+[data-theme="light"]{
+  --bg:#f0f4ff;--bg2:#e8edf8;--card:rgba(255,255,255,0.8);
+  --card-border:rgba(59,130,246,0.15);--text:#0f172a;--muted:#64748b;
+}
+
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  overflow:hidden;
+}
+
+/* ===== LEFT PANEL ===== */
+.left-panel{
+  background:linear-gradient(145deg,#020817 0%,#0f172a 40%,#1e1b4b 100%);
+  padding:48px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  position:relative;
+  overflow:hidden;
+}
+.left-panel::before{
+  content:'';position:absolute;top:-150px;right:-100px;
+  width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(99,102,241,0.2),transparent 70%);
+  pointer-events:none;
+}
+.left-panel::after{
+  content:'';position:absolute;bottom:-100px;left:-80px;
+  width:400px;height:400px;border-radius:50%;
+  background:radial-gradient(circle,rgba(59,130,246,0.15),transparent 70%);
+  pointer-events:none;
+}
+.brand-logo{
+  display:flex;align-items:center;gap:12px;
+  font-family:'Poppins',sans-serif;font-size:1.4rem;font-weight:800;
+  color:#fff;position:relative;z-index:1;
+}
+.logo-gem{
+  width:42px;height:42px;border-radius:12px;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;box-shadow:0 8px 24px rgba(99,102,241,0.4);
+}
+.brand-content{position:relative;z-index:1;}
+.live-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.25);
+  color:#86efac;border-radius:999px;padding:6px 14px;
+  font-size:12px;font-weight:600;margin-bottom:24px;
+}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);
+  animation:pulse-dot 2s ease infinite;}
+@keyframes pulse-dot{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4);}50%{box-shadow:0 0 0 6px rgba(34,197,94,0);}}
+.brand-title{
+  font-family:'Poppins',sans-serif;
+  font-size:clamp(1.9rem,3.5vw,2.8rem);font-weight:800;
+  color:#fff;line-height:1.2;margin-bottom:16px;letter-spacing:-0.02em;
+}
+.brand-title span{
+  background:linear-gradient(90deg,#818cf8,#38bdf8);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.brand-sub{color:rgba(255,255,255,0.55);font-size:0.95rem;line-height:1.7;max-width:380px;margin-bottom:40px;}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.stat-card{
+  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+  border-radius:14px;padding:18px 14px;text-align:center;
+  transition:var(--transition);
+}
+.stat-card:hover{background:rgba(255,255,255,0.09);}
+.stat-val{font-family:'Poppins',sans-serif;font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:4px;}
+.stat-lbl{font-size:11px;color:rgba(255,255,255,0.45);}
+.security-badges{
+  display:flex;flex-wrap:wrap;gap:10px;
+  position:relative;z-index:1;
+}
+.sec-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+  border-radius:8px;padding:8px 12px;font-size:11px;font-weight:600;color:rgba(255,255,255,0.6);
+}
+.bank-grade{
+  display:flex;align-items:center;gap:8px;
+  background:linear-gradient(90deg,rgba(59,130,246,0.15),rgba(139,92,246,0.15));
+  border:1px solid rgba(99,102,241,0.3);
+  border-radius:12px;padding:14px 18px;margin-bottom:20px;
+  font-size:13px;font-weight:700;color:#c7d2fe;
+  position:relative;z-index:1;
+}
+
+/* ===== RIGHT PANEL ===== */
+.right-panel{
+  display:flex;align-items:center;justify-content:center;
+  padding:40px;background:var(--bg2);
+  position:relative;overflow-y:auto;
+}
+.top-bar{
+  position:absolute;top:20px;right:20px;
+  display:flex;align-items:center;gap:10px;z-index:10;
+}
+.theme-btn{
+  background:var(--card);border:1px solid var(--card-border);
+  color:var(--text);border-radius:10px;padding:8px 12px;
+  cursor:pointer;font-size:16px;transition:var(--transition);
+}
+.theme-btn:hover{background:rgba(59,130,246,0.15);border-color:var(--primary);}
+
+.form-box{width:100%;max-width:440px;}
+
+/* Header */
+.form-title{
+  font-family:'Poppins',sans-serif;font-size:1.8rem;font-weight:800;
+  color:var(--text);margin-bottom:6px;letter-spacing:-0.02em;
+}
+.form-sub{font-size:13px;color:var(--muted);margin-bottom:28px;}
+.form-sub a{color:var(--primary);font-weight:600;text-decoration:none;}
+
+/* Last login info */
+.last-login{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);
+  border-radius:10px;padding:10px 14px;margin-bottom:20px;
+  font-size:12px;color:#86efac;font-weight:500;
+}
+
+/* Login Method Tabs */
+.method-tabs{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  background:var(--card);border:1px solid var(--card-border);
+  border-radius:12px;padding:4px;gap:4px;margin-bottom:24px;
+}
+.method-tab{
+  padding:10px 8px;border-radius:9px;border:none;
+  background:transparent;color:var(--muted);
+  font-size:12px;font-weight:600;cursor:pointer;
+  transition:var(--transition);display:flex;
+  flex-direction:column;align-items:center;gap:4px;
+}
+.method-tab.active{
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;box-shadow:0 4px 14px rgba(59,130,246,0.35);
+}
+.method-tab:not(.active):hover{background:rgba(255,255,255,0.06);color:var(--text);}
+.method-tab .tab-icon{font-size:18px;}
+
+/* Panels */
+.method-panel{display:none;}
+.method-panel.active{display:block;animation:fadeUp 0.35s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+/* Input */
+.field{margin-bottom:16px;}
+.field-label{display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:7px;}
+.input-wrap{position:relative;}
+.input-icon{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  font-size:16px;pointer-events:none;opacity:0.5;
+}
+.field-input{
+  width:100%;padding:12px 14px 12px 42px;
+  border-radius:var(--radius-sm);border:1.5px solid var(--card-border);
+  background:var(--card);color:var(--text);
+  font-size:14px;font-family:'Inter',sans-serif;
+  outline:none;transition:var(--transition);
+}
+.field-input::placeholder{color:var(--muted);}
+.field-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow);}
+.field-input.error{border-color:var(--red);box-shadow:0 0 0 3px rgba(239,68,68,0.2);}
+.field-input.success-inp{border-color:var(--green);box-shadow:0 0 0 3px rgba(34,197,94,0.15);}
+.field-hint{font-size:11px;color:var(--red);margin-top:5px;display:none;}
+.field-hint.show{display:block;}
+.pass-eye{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;font-size:16px;cursor:pointer;
+  color:var(--muted);padding:4px;transition:var(--transition);
+}
+.pass-eye:hover{color:var(--primary);}
+
+/* Password strength */
+.strength-bar{display:flex;gap:4px;margin-top:8px;}
+.strength-seg{
+  flex:1;height:4px;border-radius:2px;
+  background:rgba(255,255,255,0.1);transition:background 0.3s;
+}
+
+/* Remember + Forgot row */
+.row-between{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.remember-label{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--muted);}
+.remember-label input{accent-color:var(--primary);width:15px;height:15px;cursor:pointer;}
+.link{color:var(--primary);font-size:13px;font-weight:600;text-decoration:none;cursor:pointer;transition:var(--transition);}
+.link:hover{opacity:0.75;}
+
+/* Dropdown */
+.field-select{
+  width:100%;padding:12px 14px 12px 42px;
+  border-radius:var(--radius-sm);border:1.5px solid var(--card-border);
+  background:var(--card);color:var(--text);
+  font-size:14px;font-family:'Inter',sans-serif;
+  outline:none;transition:var(--transition);appearance:none;cursor:pointer;
+}
+.field-select:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow);}
+
+/* Submit */
+.btn-main{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:14px;border-radius:var(--radius-sm);
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:#fff;font-size:15px;font-weight:700;
+  font-family:'Inter',sans-serif;border:none;cursor:pointer;
+  box-shadow:0 8px 24px rgba(59,130,246,0.35);
+  transition:var(--transition);letter-spacing:0.01em;
+}
+.btn-main:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 14px 36px rgba(59,130,246,0.5);}
+.btn-main:active:not(:disabled){transform:translateY(0);}
+.btn-main:disabled{opacity:0.55;cursor:not-allowed;}
+.spinner{
+  width:17px;height:17px;border:2.5px solid rgba(255,255,255,0.3);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin 0.7s linear infinite;display:none;flex-shrink:0;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Security note */
+.sec-note{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  font-size:12px;color:var(--muted);margin-top:18px;
+}
+
+/* Divider */
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
+.div-line{flex:1;height:1px;background:var(--card-border);}
+.div-txt{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;}
+
+/* Google btn */
+.btn-google{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;padding:12px;border-radius:var(--radius-sm);
+  border:1.5px solid var(--card-border);background:var(--card);
+  color:var(--text);font-size:14px;font-weight:600;
+  font-family:'Inter',sans-serif;cursor:pointer;transition:var(--transition);
+}
+.btn-google:hover{border-color:var(--primary);transform:translateY(-1px);box-shadow:0 4px 16px rgba(59,130,246,0.2);}
+
+/* QR Panel */
+.qr-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  padding:32px 20px;text-align:center;
+}
+#qrCanvas{
+  border-radius:16px;padding:16px;background:#fff;
+  box-shadow:0 8px 32px rgba(0,0,0,0.3);margin:20px 0;
+}
+.qr-instruction{font-size:13px;color:var(--muted);line-height:1.6;}
+.qr-refresh{
+  margin-top:16px;padding:8px 20px;border-radius:8px;
+  border:1px solid var(--primary);background:transparent;
+  color:var(--primary);font-size:13px;font-weight:600;cursor:pointer;
+  transition:var(--transition);
+}
+.qr-refresh:hover{background:rgba(59,130,246,0.1);}
+.qr-timer{font-size:12px;color:var(--muted);margin-top:8px;}
+
+/* OTP Panel */
+.otp-inputs{
+  display:flex;gap:10px;justify-content:center;margin:20px 0;
+}
+.otp-box{
+  width:52px;height:56px;border-radius:12px;
+  border:1.5px solid var(--card-border);background:var(--card);
+  color:var(--text);font-size:20px;font-weight:700;
+  text-align:center;font-family:'Inter',sans-serif;
+  outline:none;transition:var(--transition);
+}
+.otp-box:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow);}
+.otp-box.filled{border-color:var(--primary);}
+
+/* Toast */
+#toast-container{
+  position:fixed;top:24px;right:24px;z-index:9999;
+  display:flex;flex-direction:column;gap:10px;
+  pointer-events:none;
+}
+.toast{
+  display:flex;align-items:center;gap:10px;
+  background:#1e293b;border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;padding:14px 18px;min-width:280px;max-width:360px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.4);
+  animation:slideIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+  pointer-events:all;
+}
+.toast.exit{animation:slideOut 0.3s ease forwards;}
+.toast-icon{font-size:18px;flex-shrink:0;}
+.toast-body{flex:1;}
+.toast-title{font-size:13px;font-weight:700;color:#f1f5f9;margin-bottom:2px;}
+.toast-msg{font-size:12px;color:#94a3b8;}
+.toast-close{background:none;border:none;color:#94a3b8;cursor:pointer;font-size:14px;padding:2px;}
+.toast.success{border-color:rgba(34,197,94,0.3);}
+.toast.error{border-color:rgba(239,68,68,0.3);}
+.toast.info{border-color:rgba(59,130,246,0.3);}
+@keyframes slideIn{from{opacity:0;transform:translateX(100px);}to{opacity:1;transform:translateX(0);}}
+@keyframes slideOut{to{opacity:0;transform:translateX(110px);}}
+
+/* Modal */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.7);
+  backdrop-filter:blur(6px);z-index:1000;
+  display:none;align-items:center;justify-content:center;
+  animation:fadeIn 0.2s ease;
+}
+.modal-overlay.show{display:flex;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.modal{
+  background:var(--bg2);border:1px solid var(--card-border);
+  border-radius:20px;padding:32px;width:100%;max-width:400px;
+  box-shadow:0 24px 64px rgba(0,0,0,0.5);
+  animation:popUp 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes popUp{from{opacity:0;transform:scale(0.85);}to{opacity:1;transform:scale(1);}}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.modal-title{font-family:'Poppins',sans-serif;font-size:1.2rem;font-weight:800;color:var(--text);}
+.modal-close{background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:4px;transition:var(--transition);}
+.modal-close:hover{color:var(--text);}
+.modal-step{display:none;}
+.modal-step.active{display:block;}
+
+/* MFA Screen */
+.mfa-screen{
+  display:none;flex-direction:column;align-items:center;
+  padding:32px 20px;text-align:center;
+}
+.mfa-screen.show{display:flex;}
+.mfa-icon{
+  width:72px;height:72px;border-radius:50%;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  font-size:30px;display:flex;align-items:center;justify-content:center;
+  margin-bottom:20px;box-shadow:0 8px 28px rgba(59,130,246,0.4);
+  animation:popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes popIn{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+.mfa-title{font-family:'Poppins',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:8px;}
+.mfa-sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6;}
+.mfa-otp-inputs{display:flex;gap:10px;justify-content:center;margin-bottom:20px;}
+.mfa-resend{font-size:12px;color:var(--muted);margin-top:8px;}
+.mfa-resend a{color:var(--primary);font-weight:600;cursor:pointer;}
+
+/* Success */
+.success-screen{
+  display:none;flex-direction:column;align-items:center;
+  padding:32px 20px;text-align:center;
+}
+.success-screen.show{display:flex;animation:fadeUp 0.4s ease both;}
+.success-ring{
+  width:80px;height:80px;border-radius:50%;
+  background:linear-gradient(135deg,var(--green),#16a34a);
+  font-size:36px;display:flex;align-items:center;justify-content:center;
+  margin-bottom:20px;box-shadow:0 8px 28px rgba(34,197,94,0.4);
+  animation:popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+.progress-track{width:100%;height:5px;background:rgba(255,255,255,0.08);border-radius:3px;margin-top:20px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:3px;width:0;animation:fillUp 1.8s ease forwards;}
+@keyframes fillUp{to{width:100%;}}
+
+/* Shake */
+@keyframes shake{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-6px);}40%,80%{transform:translateX(6px);}}
+.shake{animation:shake 0.4s ease;}
+
+/* Animate in */
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+.a1{animation:fadeSlideUp 0.5s 0.05s both;}
+.a2{animation:fadeSlideUp 0.5s 0.15s both;}
+.a3{animation:fadeSlideUp 0.5s 0.25s both;}
+.a4{animation:fadeSlideUp 0.5s 0.35s both;}
+.a5{animation:fadeSlideUp 0.5s 0.45s both;}
+
+/* Responsive */
+@media(max-width:768px){
+  body{grid-template-columns:1fr;}
+  .left-panel{display:none;}
+  .right-panel{padding:28px 20px;align-items:flex-start;padding-top:60px;}
+}
+
+[data-theme="light"] .field-input,[data-theme="light"] .field-select{background:rgba(255,255,255,0.9);}
+[data-theme="light"] .method-tabs{background:rgba(255,255,255,0.7);}
+[data-theme="light"] .toast{background:#fff;}
+[data-theme="light"] .toast-title{color:#0f172a;}
+[data-theme="light"] .btn-google{background:#fff;}
+[data-theme="light"] .modal{background:#f8fafc;}
+</style>
+</head>
+<body>
+
+<!-- ===== LEFT PANEL ===== -->
+<div class="left-panel">
+  <div class="brand-logo">
+    <div class="logo-gem">🔷</div>
+    <span>TechNova</span>
+  </div>
+
+  <div class="brand-content">
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      All systems operational
+    </div>
+    <h2 class="brand-title">Welcome back to<br><span>smarter banking</span></h2>
+    <p class="brand-sub">Bank-grade security with multi-layer authentication. Manage your finances, track every rupee, and grow your wealth — all in one beautifully secure platform.</p>
+    <div class="stats-grid" style="margin-bottom:36px">
+      <div class="stat-card"><div class="stat-val">₹48B+</div><div class="stat-lbl">Processed</div></div>
+      <div class="stat-card"><div class="stat-val">2M+</div><div class="stat-lbl">Active Users</div></div>
+      <div class="stat-card"><div class="stat-val">99.9%</div><div class="stat-lbl">Uptime</div></div>
+    </div>
+    <div class="bank-grade">🏦 Bank-grade security with multi-layer authentication</div>
+  </div>
+
+  <div class="security-badges">
+    <div class="sec-badge">🔒 256-bit SSL</div>
+    <div class="sec-badge">✅ PCI DSS</div>
+    <div class="sec-badge">🛡️ FDIC Insured</div>
+    <div class="sec-badge">🔐 2FA Ready</div>
+  </div>
+</div>
+
+<!-- ===== RIGHT PANEL ===== -->
+<div class="right-panel">
+  <div class="top-bar">
+    <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">🌙</button>
+  </div>
+
+  <div class="form-box">
+
+    <!-- Form Header -->
+    <div class="a1">
+      <h1 class="form-title">Sign In</h1>
+      <p class="form-sub">Don't have an account? <a href="index.html">Create one free →</a></p>
+    </div>
+
+    <!-- Last Login Info -->
+    <div class="last-login a2" id="lastLoginInfo" style="display:none">
+      📍 Last login: <span id="lastLoginText"></span>
+    </div>
+
+    <!-- Main content area -->
+    <div id="mainContent">
+
+      <!-- Google Sign In -->
+      <div class="a2">
+        <button class="btn-google" id="btnGoogle" onclick="handleGoogle()">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M17.64 9.2C17.64 8.57 17.58 7.96 17.48 7.36H9v2.72h4.84A4.14 4.14 0 0112.05 13.56v2.26h2.91C16.66 14.25 17.64 11.95 17.64 9.2Z" fill="#4285F4"/>
+            <path d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.91-2.26c-.81.54-1.84.86-3.05.86-2.34 0-4.33-1.58-5.04-3.71H.96v2.33C2.44 15.98 5.48 18 9 18Z" fill="#34A853"/>
+            <path d="M3.96 10.71A5.42 5.42 0 013.68 9c0-.59.1-1.17.28-1.71V4.96H.96A9 9 0 000 9c0 1.45.35 2.82.96 4.04L3.96 10.71Z" fill="#FBBC05"/>
+            <path d="M9 3.58c1.32 0 2.51.45 3.44 1.34l2.58-2.58C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.96L3.96 7.3C4.67 5.16 6.66 3.58 9 3.58Z" fill="#EA4335"/>
+          </svg>
+          <span>Continue with Google</span>
+        </button>
+      </div>
+
+      <div class="divider a2">
+        <div class="div-line"></div>
+        <div class="div-txt">or choose login method</div>
+        <div class="div-line"></div>
+      </div>
+
+      <!-- Login Method Tabs -->
+      <div class="method-tabs a3">
+        <button class="method-tab active" id="tab-userid" onclick="switchTab('userid')">
+          <span class="tab-icon">🪪</span><span>User ID</span>
+        </button>
+        <button class="method-tab" id="tab-qr" onclick="switchTab('qr')">
+          <span class="tab-icon">📷</span><span>QR Login</span>
+        </button>
+        <button class="method-tab" id="tab-otp" onclick="switchTab('otp')">
+          <span class="tab-icon">📱</span><span>Mobile OTP</span>
+        </button>
+      </div>
+
+      <!-- ===== USER ID PANEL ===== -->
+      <div class="method-panel active" id="panel-userid">
+
+        <form id="loginForm" onsubmit="handleLogin(event)" novalidate>
+
+          <!-- User ID -->
+          <div class="field a3">
+            <label class="field-label" for="userId">User ID</label>
+            <div class="input-wrap">
+              <span class="input-icon">🪪</span>
+              <input type="text" id="userId" class="field-input" placeholder="Enter your User ID" autocomplete="username" autofocus/>
+            </div>
+            <div class="field-hint" id="hintUserId">Please enter your User ID</div>
+          </div>
+
+          <!-- Password -->
+          <div class="field a3">
+            <label class="field-label" for="password">Password</label>
+            <div class="input-wrap">
+              <span class="input-icon">🔑</span>
+              <input type="password" id="password" class="field-input" placeholder="Enter your password" autocomplete="current-password" style="padding-right:44px"/>
+              <button type="button" class="pass-eye" id="passEye" aria-label="Toggle password">👁️</button>
+            </div>
+            <div class="strength-bar" id="strengthBar" style="display:none">
+              <div class="strength-seg" id="s1"></div>
+              <div class="strength-seg" id="s2"></div>
+              <div class="strength-seg" id="s3"></div>
+              <div class="strength-seg" id="s4"></div>
+            </div>
+            <div class="field-hint" id="hintPass">Please enter your password</div>
+          </div>
+
+          <!-- Landing selection -->
+          <div class="field a3">
+            <label class="field-label" for="startIn">Start in</label>
+            <div class="input-wrap">
+              <span class="input-icon">🏠</span>
+              <select id="startIn" class="field-select">
+                <option value="dashboard">Dashboard</option>
+                <option value="payments">Payments</option>
+                <option value="investments">Investments</option>
+                <option value="analytics">Analytics</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Remember + Forgot links row -->
+          <div class="row-between a4">
+            <label class="remember-label">
+              <input type="checkbox" id="rememberMe"/>
+              Remember User ID
+            </label>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+              <a class="link" onclick="openModal('forgotPassword')">Forgot password?</a>
+              <a class="link" style="font-size:12px;opacity:0.8" onclick="openModal('forgotUserId')">Get User ID?</a>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="a4">
+            <button type="submit" class="btn-main" id="submitBtn" disabled>
+              <div class="spinner" id="spinner"></div>
+              <span id="submitTxt">Sign In Securely</span>
+              <span id="submitArrow">→</span>
+            </button>
+          </div>
+
+        </form>
+
+        <p class="sec-note a5">🔒 Bank-grade 256-bit encrypted connection</p>
+      </div>
+
+      <!-- ===== QR PANEL ===== -->
+      <div class="method-panel" id="panel-qr">
+        <div class="qr-wrap">
+          <p style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">Scan with TechNova Mobile App</p>
+          <p class="qr-instruction">Open the TechNova app on your phone, tap <b>Scan to Login</b> and point it at this QR code.</p>
+          <div id="qrCanvas"></div>
+          <div class="qr-timer" id="qrTimer">⏱ Refreshes in <span id="qrCountdown">60</span>s</div>
+          <button class="qr-refresh" onclick="generateQR()">↻ Refresh QR</button>
+          <p class="qr-instruction" style="margin-top:16px;font-size:11px;">🔒 This QR code is one-time use &amp; expires automatically</p>
+        </div>
+      </div>
+
+      <!-- ===== MOBILE OTP PANEL ===== -->
+      <div class="method-panel" id="panel-otp">
+        <div id="otpStep1">
+          <div class="field" style="margin-top:4px">
+            <label class="field-label" for="phoneNum">Mobile Number</label>
+            <div class="input-wrap">
+              <span class="input-icon">📱</span>
+              <input type="tel" id="phoneNum" class="field-input" placeholder="+91 98765 43210"/>
+            </div>
+          </div>
+          <button class="btn-main" style="margin-top:4px" onclick="sendOTP()">
+            <span>Send OTP</span><span>→</span>
+          </button>
+        </div>
+        <div id="otpStep2" style="display:none;text-align:center">
+          <p style="font-size:14px;color:var(--muted);margin-bottom:16px">Enter the 6-digit OTP sent to <b id="otpPhone" style="color:var(--text)"></b></p>
+          <div class="otp-inputs" id="otpInputs">
+            <input class="otp-box" maxlength="1" type="text" inputmode="numeric"/>
+            <input class="otp-box" maxlength="1" type="text" inputmode="numeric"/>
+            <input class="otp-box" maxlength="1" type="text" inputmode="numeric"/>
+            <input class="otp-box" maxlength="1" type="text" inputmode="numeric"/>
+            <input class="otp-box" maxlength="1" type="text" inputmode="numeric"/>
+            <input class="otp-box" maxlength="1" type="text" inputmode="numeric"/>
+          </div>
+          <button class="btn-main" onclick="verifyOTP()">Verify OTP →</button>
+          <p class="mfa-resend" style="margin-top:12px">Didn't receive? <a onclick="resendOTP()">Resend OTP</a></p>
+        </div>
+      </div>
+
+    </div><!-- /#mainContent -->
+
+    <!-- ===== MFA SCREEN ===== -->
+    <div class="mfa-screen" id="mfaScreen">
+      <div class="mfa-icon">🔐</div>
+      <h3 class="mfa-title">Two-Factor Authentication</h3>
+      <p class="mfa-sub">We've sent a 6-digit code to your registered device. Enter it below to complete sign in.</p>
+      <div class="mfa-otp-inputs" id="mfaInputs">
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric"/>
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric"/>
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric"/>
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric"/>
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric"/>
+        <input class="otp-box" maxlength="1" type="text" inputmode="numeric"/>
+      </div>
+      <button class="btn-main" style="max-width:280px" onclick="verifyMFA()">Verify &amp; Continue →</button>
+      <p class="mfa-resend">Didn't receive? <a onclick="showToast('info','Code Resent','A new MFA code has been sent to your device.')">Resend code</a></p>
+    </div>
+
+    <!-- ===== SUCCESS SCREEN ===== -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-ring">✓</div>
+      <h3 style="font-family:'Poppins',sans-serif;font-size:1.4rem;font-weight:800;margin-bottom:8px">Welcome back!</h3>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:4px">Logging you in to your <b id="landingName" style="color:var(--text)">Dashboard</b>…</p>
+      <div class="progress-track"><div class="progress-fill"></div></div>
+    </div>
+
+  </div><!-- /.form-box -->
+</div><!-- /.right-panel -->
+
+<!-- ===== FORGOT PASSWORD MODAL ===== -->
+<div class="modal-overlay" id="modal-forgotPassword">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">🔑 Reset Password</span>
+      <button class="modal-close" onclick="closeModal('forgotPassword')">✕</button>
+    </div>
+    <div class="modal-step active" id="fp-step1">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Enter your email or phone and we'll send you a reset link.</p>
+      <div class="field">
+        <label class="field-label">Email or Phone</label>
+        <div class="input-wrap">
+          <span class="input-icon">✉️</span>
+          <input type="text" id="fpContact" class="field-input" placeholder="you@example.com or +91..."/>
+        </div>
+      </div>
+      <button class="btn-main" onclick="sendResetLink()">Send Reset Link →</button>
+    </div>
+    <div class="modal-step" id="fp-step2">
+      <div style="text-align:center;padding:16px 0">
+        <div style="font-size:48px;margin-bottom:12px">📧</div>
+        <p style="font-weight:700;color:var(--text);margin-bottom:8px">Reset link sent!</p>
+        <p style="font-size:13px;color:var(--muted)">Check your inbox and follow the instructions to reset your password.</p>
+        <button class="btn-main" style="margin-top:20px" onclick="closeModal('forgotPassword')">Done ✓</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FORGOT USER ID MODAL ===== -->
+<div class="modal-overlay" id="modal-forgotUserId">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">🪪 Recover User ID</span>
+      <button class="modal-close" onclick="closeModal('forgotUserId')">✕</button>
+    </div>
+    <div class="modal-step active" id="uid-step1">
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Enter your registered email or phone to recover your User ID.</p>
+      <div class="field">
+        <label class="field-label">Email or Phone</label>
+        <div class="input-wrap">
+          <span class="input-icon">✉️</span>
+          <input type="text" id="uidContact" class="field-input" placeholder="you@example.com or +91..."/>
+        </div>
+      </div>
+      <button class="btn-main" onclick="sendUserId()">Send User ID →</button>
+    </div>
+    <div class="modal-step" id="uid-step2">
+      <div style="text-align:center;padding:16px 0">
+        <div style="font-size:48px;margin-bottom:12px">✅</div>
+        <p style="font-weight:700;color:var(--text);margin-bottom:8px">Recovery sent!</p>
+        <p style="font-size:13px;color:var(--muted)">Your User ID has been sent to your registered contact.</p>
+        <button class="btn-main" style="margin-top:20px" onclick="closeModal('forgotUserId')">Done ✓</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<script>
+// ===== THEME =====
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeBtn');
+const savedTheme = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', savedTheme);
+themeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+themeBtn.addEventListener('click', () => {
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  const next = isDark ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeBtn.textContent = next === 'dark' ? '☀️' : '🌙';
+});
+
+// ===== LAST LOGIN =====
+const lastLogin = localStorage.getItem('lastLogin');
+if (lastLogin) {
+  document.getElementById('lastLoginInfo').style.display = 'flex';
+  document.getElementById('lastLoginText').textContent = lastLogin;
+}
+
+// ===== AUTOFILL REMEMBERED USER ID =====
+const savedId = localStorage.getItem('rememberedUserId');
+if (savedId) {
+  const inp = document.getElementById('userId');
+  inp.value = savedId;
+  document.getElementById('rememberMe').checked = true;
+}
+
+// ===== TAB SWITCHING =====
+function switchTab(tab) {
+  ['userid','qr','otp'].forEach(t => {
+    document.getElementById('tab-'+t).classList.toggle('active', t===tab);
+    document.getElementById('panel-'+t).classList.toggle('active', t===tab);
+  });
+  if (tab === 'qr') generateQR();
+  if (tab === 'otp') document.getElementById('phoneNum').focus();
+}
+
+// ===== SUBMIT BUTTON ENABLE/DISABLE =====
+const userIdEl = document.getElementById('userId');
+const passwordEl = document.getElementById('password');
+const submitBtn = document.getElementById('submitBtn');
+
+function validateInputs() {
+  const uid = userIdEl.value.trim();
+  const pwd = passwordEl.value;
+  submitBtn.disabled = !(uid.length >= 3 && pwd.length >= 1);
+}
+userIdEl.addEventListener('input', () => { validateInputs(); clearHint('hintUserId', userIdEl); });
+passwordEl.addEventListener('input', () => { validateInputs(); clearHint('hintPass', passwordEl); showStrength(); });
+
+function clearHint(hintId, inp) {
+  document.getElementById(hintId).classList.remove('show');
+  inp.classList.remove('error');
+}
+
+function showHint(hintId, inp) {
+  document.getElementById(hintId).classList.add('show');
+  inp.classList.add('error');
+  inp.parentElement.parentElement.classList.add('shake');
+  setTimeout(() => inp.parentElement.parentElement.classList.remove('shake'), 400);
+}
+
+// ===== PASS STRENGTH =====
+function showStrength() {
+  const v = passwordEl.value;
+  const bar = document.getElementById('strengthBar');
+  bar.style.display = v.length > 0 ? 'flex' : 'none';
+  let score = 0;
+  if (v.length >= 6) score++;
+  if (/[A-Z]/.test(v)) score++;
+  if (/[0-9]/.test(v)) score++;
+  if (/[^A-Za-z0-9]/.test(v)) score++;
+  const colors = ['#ef4444','#f97316','#eab308','#22c55e'];
+  for (let i = 1; i <= 4; i++) {
+    const seg = document.getElementById('s'+i);
+    seg.style.background = i <= score ? colors[score-1] : 'rgba(255,255,255,0.1)';
+  }
+}
+
+// ===== PASSWORD TOGGLE =====
+document.getElementById('passEye').addEventListener('click', () => {
+  const vis = passwordEl.type === 'text';
+  passwordEl.type = vis ? 'password' : 'text';
+  document.getElementById('passEye').textContent = vis ? '👁️' : '🙈';
+});
+
+// ===== ENTER KEY =====
+document.getElementById('userId').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); passwordEl.focus(); }
+});
+
+// ===== LOGIN FORM SUBMIT =====
+function handleLogin(e) {
+  e.preventDefault();
+  const uid = userIdEl.value.trim();
+  const pwd = passwordEl.value;
+  let valid = true;
+  if (!uid || uid.length < 3) { showHint('hintUserId', userIdEl); valid = false; }
+  if (!pwd) { showHint('hintPass', passwordEl); valid = false; }
+  if (!valid) { showToast('error','Validation Error','Please fill in all required fields.'); return; }
+
+  // Remember User ID
+  if (document.getElementById('rememberMe').checked) {
+    localStorage.setItem('rememberedUserId', uid);
+  } else {
+    localStorage.removeItem('rememberedUserId');
+  }
+
+  setLoading(true);
+  showToast('info','Authenticating…','Verifying your credentials securely.');
+
+  setTimeout(() => {
+    setLoading(false);
+    showMFA();
+  }, 1800);
+}
+
+function setLoading(on) {
+  submitBtn.disabled = on;
+  document.getElementById('spinner').style.display = on ? 'block' : 'none';
+  document.getElementById('submitTxt').textContent = on ? 'Signing in…' : 'Sign In Securely';
+  document.getElementById('submitArrow').style.display = on ? 'none' : 'inline';
+}
+
+// ===== MFA =====
+function showMFA() {
+  document.getElementById('mainContent').style.display = 'none';
+  document.getElementById('mfaScreen').classList.add('show');
+  initOtpBoxes('mfaInputs');
+  showToast('info','MFA Required','Enter the 6-digit code sent to your device.');
+}
+
+function verifyMFA() {
+  const boxes = document.querySelectorAll('#mfaInputs .otp-box');
+  const code = [...boxes].map(b => b.value).join('');
+  if (code.length < 6) {
+    showToast('error','Incomplete Code','Please enter all 6 digits.');
+    document.getElementById('mfaInputs').classList.add('shake');
+    setTimeout(() => document.getElementById('mfaInputs').classList.remove('shake'), 400);
+    return;
+  }
+  showToast('success','Verified!','MFA confirmed. Logging you in…');
+  document.getElementById('mfaScreen').classList.remove('show');
+  showSuccess();
+}
+
+// ===== SUCCESS =====
+function showSuccess() {
+  const landing = document.getElementById('startIn')?.value || 'dashboard';
+  const names = {dashboard:'Dashboard',payments:'Payments',investments:'Investments',analytics:'Analytics'};
+  document.getElementById('landingName').textContent = names[landing] || 'Dashboard';
+  document.getElementById('successScreen').classList.add('show');
+  localStorage.setItem('lastLogin', new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}));
+  setTimeout(() => { window.location.href = 'dashboard.html'; }, 2200);
+}
+
+// ===== GOOGLE LOGIN =====
+function handleGoogle() {
+  const btn = document.getElementById('btnGoogle');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="display:block;border-top-color:var(--primary);border-color:rgba(59,130,246,0.2)"></div><span>Connecting…</span>';
+  showToast('info','Google Sign-In','Redirecting to Google authentication…');
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2C17.64 8.57 17.58 7.96 17.48 7.36H9v2.72h4.84A4.14 4.14 0 0112.05 13.56v2.26h2.91C16.66 14.25 17.64 11.95 17.64 9.2Z" fill="#4285F4"/><path d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.91-2.26c-.81.54-1.84.86-3.05.86-2.34 0-4.33-1.58-5.04-3.71H.96v2.33C2.44 15.98 5.48 18 9 18Z" fill="#34A853"/><path d="M3.96 10.71A5.42 5.42 0 013.68 9c0-.59.1-1.17.28-1.71V4.96H.96A9 9 0 000 9c0 1.45.35 2.82.96 4.04L3.96 10.71Z" fill="#FBBC05"/><path d="M9 3.58c1.32 0 2.51.45 3.44 1.34l2.58-2.58C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.96L3.96 7.3C4.67 5.16 6.66 3.58 9 3.58Z" fill="#EA4335"/></svg><span>Continue with Google</span>';
+    showMFA();
+  }, 1500);
+}
+
+// ===== QR CODE =====
+let qrTimer = null;
+let qrSeconds = 60;
+function generateQR() {
+  const canvas = document.getElementById('qrCanvas');
+  canvas.innerHTML = '';
+  const token = Math.random().toString(36).substring(2,18).toUpperCase();
+  new QRCode(canvas, {
+    text: `technova://auth?token=${token}&ts=${Date.now()}`,
+    width: 200, height: 200,
+    colorDark: '#0f172a', colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.H
+  });
+  qrSeconds = 60;
+  clearInterval(qrTimer);
+  qrTimer = setInterval(() => {
+    qrSeconds--;
+    document.getElementById('qrCountdown').textContent = qrSeconds;
+    if (qrSeconds <= 0) { clearInterval(qrTimer); generateQR(); }
+  }, 1000);
+}
+
+// ===== MOBILE OTP =====
+function sendOTP() {
+  const phone = document.getElementById('phoneNum').value.trim();
+  if (!phone || phone.length < 10) {
+    showToast('error','Invalid Number','Please enter a valid mobile number.');
+    return;
+  }
+  document.getElementById('otpPhone').textContent = phone;
+  document.getElementById('otpStep1').style.display = 'none';
+  document.getElementById('otpStep2').style.display = 'block';
+  initOtpBoxes('otpInputs');
+  showToast('success','OTP Sent!','A 6-digit OTP has been sent to '+phone);
+}
+
+function verifyOTP() {
+  const boxes = document.querySelectorAll('#otpInputs .otp-box');
+  const code = [...boxes].map(b => b.value).join('');
+  if (code.length < 6) { showToast('error','Incomplete','Enter all 6 OTP digits.'); return; }
+  showToast('success','OTP Verified!','Logging you in…');
+  document.getElementById('mainContent').style.display = 'none';
+  showSuccess();
+}
+
+function resendOTP() {
+  showToast('info','OTP Resent','A new OTP has been sent to your number.');
+}
+
+// ===== OTP BOX NAVIGATION =====
+function initOtpBoxes(containerId) {
+  const boxes = document.querySelectorAll('#'+containerId+' .otp-box');
+  boxes.forEach((box, i) => {
+    box.value = '';
+    box.classList.remove('filled');
+    box.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !box.value && i > 0) boxes[i-1].focus();
+    });
+    box.addEventListener('input', (e) => {
+      box.value = box.value.replace(/\D/g,'').slice(-1);
+      box.classList.toggle('filled', !!box.value);
+      if (box.value && i < boxes.length-1) boxes[i+1].focus();
+    });
+    box.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const data = e.clipboardData.getData('text').replace(/\D/g,'');
+      boxes.forEach((b,j) => { if(data[j]) { b.value=data[j]; b.classList.add('filled'); } });
+      if(data.length >= boxes.length) boxes[boxes.length-1].focus();
+    });
+  });
+  boxes[0].focus();
+}
+
+// ===== MODALS =====
+function openModal(name) {
+  document.getElementById('modal-'+name).classList.add('show');
+}
+function closeModal(name) {
+  document.getElementById('modal-'+name).classList.remove('show');
+  // Reset steps
+  if (name === 'forgotPassword') {
+    document.getElementById('fp-step1').classList.add('active');
+    document.getElementById('fp-step2').classList.remove('active');
+  }
+  if (name === 'forgotUserId') {
+    document.getElementById('uid-step1').classList.add('active');
+    document.getElementById('uid-step2').classList.remove('active');
+  }
+}
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', (e) => { if(e.target===o) o.classList.remove('show'); });
+});
+
+function sendResetLink() {
+  const v = document.getElementById('fpContact').value.trim();
+  if (!v) { showToast('error','Required','Enter your email or phone.'); return; }
+  document.getElementById('fp-step1').classList.remove('active');
+  document.getElementById('fp-step2').classList.add('active');
+  showToast('success','Reset Link Sent','Check your inbox for the reset link.');
+}
+
+function sendUserId() {
+  const v = document.getElementById('uidContact').value.trim();
+  if (!v) { showToast('error','Required','Enter your email or phone.'); return; }
+  document.getElementById('uid-step1').classList.remove('active');
+  document.getElementById('uid-step2').classList.add('active');
+  showToast('success','User ID Sent','Your User ID has been sent to your contact.');
+}
+
+// ===== TOAST =====
+function showToast(type, title, msg) {
+  const icons = {success:'✅', error:'❌', info:'ℹ️'};
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `
+    <span class="toast-icon">${icons[type]||'ℹ️'}</span>
+    <div class="toast-body">
+      <div class="toast-title">${title}</div>
+      <div class="toast-msg">${msg}</div>
+    </div>
+    <button class="toast-close" onclick="dismissToast(this.parentElement)">✕</button>
+  `;
+  container.appendChild(toast);
+  setTimeout(() => dismissToast(toast), 4500);
+}
+function dismissToast(el) {
+  if (!el || !el.parentElement) return;
+  el.classList.add('exit');
+  setTimeout(() => el.remove(), 300);
+}
+
+// ===== ESC to close modals =====
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.show').forEach(m => m.classList.remove('show'));
+});
+</script>
+</body>
+</html>
