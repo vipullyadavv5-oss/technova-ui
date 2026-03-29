@@ -125,7 +125,7 @@
 
       <!-- Quick Actions -->
       <div class="quick-actions animate-in">
-        <div class="quick-action">
+        <div class="quick-action" id="headerSendMoneyBtn" style="cursor: pointer;">
           <div class="quick-action-icon">📤</div>
           <div class="quick-action-label">Send Money</div>
         </div>
@@ -178,7 +178,7 @@
             </div>
           </div>
           <div class="balance-actions" style="margin-top:16px;">
-            <button class="balance-action-btn">📤 Send</button>
+            <button class="balance-action-btn" id="balanceSendMoneyBtn">📤 Send</button>
             <button class="balance-action-btn">📥 Receive</button>
             <button class="balance-action-btn">📋 Statement</button>
           </div>
@@ -521,6 +521,52 @@
     </div><!-- /page-content -->
   </div><!-- /app-main -->
 </div><!-- /app-shell -->
+
+<!-- Send Money Modal -->
+<div id="sendMoneyModal" class="modal">
+  <div class="modal-content card">
+    <div class="modal-header">
+      <h3 class="heading-md">Send Money</h3>
+      <button class="modal-close" id="closeSendMoneyBtn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-tabs">
+        <button class="form-tab active" id="tabBank" type="button">Bank Account</button>
+        <button class="form-tab" id="tabUpi" type="button">UPI ID</button>
+      </div>
+
+      <!-- Bank Transfer Form -->
+      <form id="bankForm" class="send-form active">
+        <div class="form-group">
+          <label>Account Number</label>
+          <input type="text" class="input-field" placeholder="Enter account number" required />
+        </div>
+        <div class="form-group">
+          <label>IFSC Code</label>
+          <input type="text" class="input-field" placeholder="Enter IFSC code" required />
+        </div>
+        <div class="form-group">
+          <label>Amount (₹)</label>
+          <input type="number" class="input-field amount-field" placeholder="0" min="1" required />
+        </div>
+        <button type="submit" class="btn btn-primary w-100" style="width:100%; justify-content:center;">Send Money</button>
+      </form>
+
+      <!-- UPI Transfer Form -->
+      <form id="upiForm" class="send-form">
+        <div class="form-group">
+          <label>UPI ID</label>
+          <input type="text" class="input-field" placeholder="username@upi" required />
+        </div>
+        <div class="form-group">
+          <label>Amount (₹)</label>
+          <input type="number" class="input-field amount-field" placeholder="0" min="1" required />
+        </div>
+        <button type="submit" class="btn btn-primary w-100" style="width:100%; justify-content:center;">Send via UPI</button>
+      </form>
+    </div>
+  </div>
+</div>
 
 <script src="app.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

@@ -158,5 +158,81 @@ function drawChart() {
     path.style.strokeDashoffset = '0';
   }
 }
-// Call old drawChart if path exists
 if(document.querySelector('.chart-svg path')) setTimeout(drawChart, 100);
+
+// ============================================
+// SEND MONEY MODAL LOGIC
+// ============================================
+const sendMoneyModal = document.getElementById('sendMoneyModal');
+if (sendMoneyModal) {
+  const headerBtn = document.getElementById('headerSendMoneyBtn');
+  const balanceBtn = document.getElementById('balanceSendMoneyBtn');
+  const closeBtn = document.getElementById('closeSendMoneyBtn');
+  
+  const tabBank = document.getElementById('tabBank');
+  const tabUpi = document.getElementById('tabUpi');
+  const bankForm = document.getElementById('bankForm');
+  const upiForm = document.getElementById('upiForm');
+
+  const openModal = () => {
+    sendMoneyModal.classList.add('show');
+  };
+
+  if (headerBtn) headerBtn.addEventListener('click', openModal);
+  if (balanceBtn) balanceBtn.addEventListener('click', openModal);
+
+  closeBtn.addEventListener('click', () => {
+    sendMoneyModal.classList.remove('show');
+  });
+
+  window.addEventListener('click', (e) => {
+    if (e.target === sendMoneyModal) {
+      sendMoneyModal.classList.remove('show');
+    }
+  });
+
+  tabBank.addEventListener('click', () => {
+    tabBank.classList.add('active');
+    tabUpi.classList.remove('active');
+    bankForm.classList.add('active');
+    upiForm.classList.remove('active');
+  });
+
+  tabUpi.addEventListener('click', () => {
+    tabUpi.classList.add('active');
+    tabBank.classList.remove('active');
+    upiForm.classList.add('active');
+    bankForm.classList.remove('active');
+  });
+
+  const handleSendSubmit = (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    const originalText = btn.innerText;
+    
+    btn.innerText = 'Sending...';
+    btn.disabled = true;
+    btn.style.opacity = '0.7';
+    
+    // Simulate API call
+    setTimeout(() => {
+      alert('Money sent successfully! 🎉');
+      sendMoneyModal.classList.remove('show');
+      btn.innerText = originalText;
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      e.target.reset();
+      
+      // Optionally update balance
+      const balanceAmountEl = document.querySelector('.balance-amount');
+      if (balanceAmountEl) {
+        // Just a mock update
+        balanceAmountEl.innerHTML = `₹48,820.<span style="font-size:1.6rem; opacity:0.85;">50</span>`;
+      }
+    }, 1500);
+  };
+
+  bankForm.addEventListener('submit', handleSendSubmit);
+  upiForm.addEventListener('submit', handleSendSubmit);
+}
+
